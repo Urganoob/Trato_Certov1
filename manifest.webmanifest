@@ -5,7 +5,7 @@
   "display": "standalone",
   "background_color": "#0b1224",
   "theme_color": "#22c55e",
-  "description": "Lançamento rápido por box (A01..A16, B16..B01). Offline-first e exporta CSV.",
+  "description": "Lançamento por box (A01..A16, B16..B01). Offline-first, exporta CSV e sincroniza quando online.",
   "icons": [
     {
       "src": "icons/icon-192.png",
