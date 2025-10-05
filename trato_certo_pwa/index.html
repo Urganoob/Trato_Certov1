@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ASG – Trato Certo</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#22c55e" />
+  <style>
+    :root { --bg:#0b1224; --card:#0f172a; --text:#e5e7eb; --muted:#94a3b8; --accent:#22c55e; --line:rgba(255,255,255,.08); }
+    html,body{height:100%}
+    body{margin:0;background:linear-gradient(160deg,#0b1225,#0a0f1e 60%);color:var(--text);font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu}
+    .wrap{max-width:780px;margin:0 auto;padding:16px}
+    .card{background:rgba(17,24,39,.85);backdrop-filter: blur(6px);border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+    h1{font-size:20px;margin:0 0 12px}
+    label{display:block;font-size:12px;color:var(--muted);margin:4px 0 4px}
+    input,select,button,textarea{width:100%;border-radius:12px;border:1px solid var(--line);background:#0b1224;color:var(--text);padding:12px 12px;font-size:16px;outline:none}
+    input:focus,select:focus,textarea:focus{border-color:#334155;box-shadow:0 0 0 3px rgba(59,130,246,.2)}
+    .row{display:flex;gap:10px;align-items:end}
+    .row>*{flex:1}
+    .btn{cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 14px;border-radius:14px;border:1px solid var(--line);background:#0d1429}
+    .btn.primary{background:linear-gradient(180deg,#22c55e,#16a34a);border-color:transparent;color:#05240f}
+    .small{font-size:12px;color:var(--muted)}
+    .diet{display:flex;gap:8px}
+    .diet input{display:none}
+    .chip{padding:9px 12px;border-radius:999px;background:#0b1224;border:1px solid var(--line)}
+    .diet input:checked + .chip{background:linear-gradient(180deg,#0ea5e9,#0284c7);border-color:#0284c7}
+    table{width:100%;border-collapse:separate;border-spacing:0 8px}
+    th{font-weight:600;text-align:left;font-size:12px;color:#9fb0c7}
+    td{background:#0b1224;border:1px solid var(--line);border-left:none;border-right:none;padding:10px 12px}
+    .right{text-align:right}
+    .muted{color:var(--muted)}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>🐂 ASG – Trato Certo <span class="small" id="status"></span></h1>
+      <div class="row">
+        <div>
+          <label for="tratador">Tratador</label>
+          <input id="tratador" autocomplete="name" placeholder="Nome do tratador" />
+        </div>
+        <div>
+          <label for="datahora">Data/Hora</label>
+          <input id="datahora" disabled />
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label for="box">Box</label>
+          <select id="box"></select>
+        </div>
+        <div>
+          <label>Dieta</label>
+          <div class="diet">
+            <label><input type="radio" name="diet" value="D1"><span class="chip">D1</span></label>
+            <label><input type="radio" name="diet" value="D2"><span class="chip">D2</span></label>
+            <label><input type="radio" name="diet" value="D3"><span class="chip">D3</span></label>
+            <label><input type="radio" name="diet" value="D4"><span class="chip">D4</span></label>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label for="pesoin">Peso inicial (kg)</label>
+          <input id="pesoin" type="number" inputmode="decimal" step="0.1" placeholder="Ex.: 1240,0" />
+        </div>
+        <div>
+          <label for="pesoout">Peso final (kg)</label>
+          <input id="pesoout" type="number" inputmode="decimal" step="0.1" placeholder="Ex.: 1350,0" />
+        </div>
+      </div>
+
+      <div>
+        <label for="obs">Observações</label>
+        <textarea id="obs" rows="2" placeholder="Sobra, ajuste umidade, etc. (opcional)"></textarea>
+      </div>
+
+      <div class="row" style="margin-top:10px">
+        <button class="btn" id="btnPrev">◀️ Anterior</button>
+        <button class="btn primary" id="btnLanc">✅ Lançar (Enter)</button>
+        <button class="btn" id="btnNext">Próximo ▶️</button>
+      </div>
+
+      <div class="row" style="margin-top:10px">
+        <button class="btn" id="btnExport">⬇️ Exportar CSV</button>
+        <button class="btn" id="btnUndo">↩️ Desfazer último</button>
+      </div>
+
+      <div class="small" style="margin-top:8px">
+        Dica: <b>Enter</b> lança • <b>Ctrl+Z</b> desfaz • Repete dieta e usa o <i>peso final</i> anterior como <i>peso inicial</i> do próximo.
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <h1 style="font-size:16px">Histórico</h1>
+      <div class="small muted" id="histInfo">0 lançamentos</div>
+      <div style="overflow:auto">
+        <table>
+          <thead>
+            <tr>
+              <th>Data</th>
+              <th>Box</th>
+              <th>Dieta</th>
+              <th class="right">Peso In</th>
+              <th class="right">Peso Out</th>
+              <th class="right">Líquido</th>
+              <th>Tratador</th>
+              <th>Obs.</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="hist"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const $ = (id)=>document.getElementById(id);
+    const KEYS = {settings:'trato_settings', entries:'trato_entries'};
+
+    const SEQ = [
+      ...Array.from({length:16}, (_,i)=>`A${String(i+1).padStart(2,'0')}`),
+      ...Array.from({length:16}, (_,i)=>`B${String(16 - i).padStart(2,'0')}`)
+    ]; // A01..A16, B16..B01
+
+    function nowBR(){
+      try{
+        const fmt = new Intl.DateTimeFormat('pt-BR',{ timeZone:'America/Araguaina', year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', second:'2-digit'});
+        const parts = fmt.formatToParts(new Date());
+        const get = (t)=>parts.find(p=>p.type===t).value;
+        const dia = `${get('day')}/${get('month')}/${get('year')}`;
+        const hora = `${get('hour')}:${get('minute')}:${get('second')}`;
+        return {iso:new Date().toISOString(), dia, hora};
+      }catch(e){
+        const d=new Date();
+        const pad=n=>String(n).padStart(2,'0');
+        return {iso:d.toISOString(), dia:`${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()}`, hora:`${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`};
+      }
+    }
+
+    function loadEntries(){ try{return JSON.parse(localStorage.getItem(KEYS.entries)||'[]')}catch{return []} }
+    function saveEntries(v){ localStorage.setItem(KEYS.entries, JSON.stringify(v)); }
+    let entries = loadEntries();
+
+    function loadSettings(){ try{return JSON.parse(localStorage.getItem(KEYS.settings)||'{}')}catch{return {}} }
+    function saveSettings(v){ localStorage.setItem(KEYS.settings, JSON.stringify(v)); }
+    let settings = Object.assign({tratador:''}, loadSettings());
+
+    function setStatus(){
+      $("status").textContent = navigator.onLine ? "• online" : "• offline";
+    }
+    window.addEventListener('online', setStatus);
+    window.addEventListener('offline', setStatus);
+
+    function populateBoxes(){
+      const sel = $("box");
+      sel.innerHTML = "";
+      SEQ.forEach(b=>{
+        const opt = document.createElement("option");
+        opt.value=b; opt.textContent=b;
+        sel.appendChild(opt);
+      });
+      // default to first or last used
+      if(entries.length){
+        const last = entries[entries.length-1];
+        const idx = (SEQ.indexOf(last.box)+1) % SEQ.length;
+        sel.value = SEQ[idx];
+      }else{
+        sel.value = SEQ[0];
+      }
+    }
+
+    function setDiet(v){
+      const r = document.querySelector(`input[name="diet"][value="${v}"]`);
+      if(r) r.checked = true;
+    }
+    function getDiet(){
+      const r = document.querySelector('input[name="diet"]:checked');
+      return r ? r.value : "";
+    }
+
+    function renderNow(){ const t = nowBR(); $("datahora").value = `${t.dia} ${t.hora}`; }
+
+    function prefillFromLast(){
+      if(!entries.length) return;
+      const last = entries[entries.length-1];
+      setDiet(last.diet);
+      $("pesoin").value = last.pesoOut;
+    }
+
+    function nextBox(cur){
+      const i = SEQ.indexOf(cur);
+      if(i<0) return SEQ[0];
+      return SEQ[(i+1)%SEQ.length];
+    }
+
+    function fmt(n){ return Number(n).toLocaleString('pt-BR', {minimumFractionDigits:1, maximumFractionDigits:1}); }
+
+    function renderHist(){
+      const tb = $("hist"); tb.innerHTML = "";
+      const view = entries.slice(-50).reverse();
+      for(const r of view){
+        const tr = document.createElement("tr");
+        const cells = [
+          `${r.dia} ${r.hora}`,
+          r.box, r.diet,
+          `<span class="right">${fmt(r.pesoIn)}</span>`,
+          `<span class="right">${fmt(r.pesoOut)}</span>`,
+          `<span class="right">${fmt(r.liq)}</span>`,
+          r.tratador||"", r.obs||"",
+          `<button class="btn" data-del="${r.id}">Excluir</button>`
+        ];
+        for(const c of cells){ const td=document.createElement("td"); td.innerHTML=c; tr.appendChild(td); }
+        tb.appendChild(tr);
+      }
+      $("histInfo").textContent = `${entries.length} lançamento(s)`;
+    }
+
+    function validate(){
+      const trat = $("tratador").value.trim();
+      const box = $("box").value;
+      const diet = getDiet();
+      const pin = parseFloat($("pesoin").value.replace(',','.'));
+      const pout = parseFloat($("pesoout").value.replace(',','.'));
+      let msg = [];
+      if(!trat) msg.push("Informe o tratador");
+      if(!box) msg.push("Selecione o box");
+      if(!diet) msg.push("Selecione a dieta");
+      if(!Number.isFinite(pin)) msg.push("Peso inicial inválido");
+      if(!Number.isFinite(pout)) msg.push("Peso final inválido");
+      return {ok:msg.length===0, msg: msg.join("\n")};
+    }
+
+    function launch(){
+      const v = validate();
+      if(!v.ok){ alert(v.msg); return; }
+      const diet = getDiet();
+      const pin = parseFloat($("pesoin").value.replace(',','.'));
+      const pout = parseFloat($("pesoout").value.replace(',','.'));
+      const liq = +(pout - pin).toFixed(1);
+      if(liq < 0){
+        if(!confirm("Peso final menor que o inicial. Deseja lançar mesmo assim?")) return;
+      }
+      const t = nowBR();
+      const row = {
+        id: crypto.randomUUID(),
+        iso: t.iso, dia: t.dia, hora: t.hora,
+        tratador: $("tratador").value.trim(),
+        box: $("box").value,
+        diet, pesoIn: pin, pesoOut: pout, liq,
+        obs: $("obs").value.trim()
+      };
+      entries.push(row); saveEntries(entries);
+      settings.tratador = row.tratador; saveSettings(settings);
+
+      // Prepare next launch
+      $("box").value = nextBox(row.box);
+      setDiet(row.diet);
+      $("pesoin").value = String(row.pesoOut);
+      $("pesoout").value = "";
+      $("obs").value = "";
+      renderNow();
+      $("pesoout").focus();
+
+      if('vibrate' in navigator) navigator.vibrate(15);
+      renderHist();
+    }
+
+    function undo(){
+      if(!entries.length) return;
+      const last = entries[entries.length-1];
+      if(!confirm(`Desfazer último lançamento (${last.box} / ${last.diet})?`)) return;
+      entries.pop(); saveEntries(entries); renderHist();
+      $("box").value = last.box;
+      setDiet(last.diet);
+      $("pesoin").value = last.pesoIn;
+      $("pesoout").value = last.pesoOut;
+      $("obs").value = last.obs||"";
+    }
+
+    function exportCSV(){
+      const header = ['data','hora','box','dieta','peso_inicial','peso_final','peso_liquido','tratador','obs'];
+      const lines = [header.join(';')];
+      for(const r of entries){
+        lines.push([r.dia,r.hora,r.box,r.diet,r.pesoIn,r.pesoOut,r.liq,r.tratador,(r.obs||'').replaceAll(';',',')].join(';'));
+      }
+      const blob = new Blob(["\ufeff"+lines.join("\n")], {type:"text/csv;charset=utf-8"});
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "trato_certo.csv";
+      a.click();
+      setTimeout(()=>URL.revokeObjectURL(a.href), 500);
+    }
+
+    document.addEventListener("DOMContentLoaded", ()=>{
+      setStatus();
+      populateBoxes();
+      $("tratador").value = settings.tratador || "";
+      renderNow();
+      if(entries.length){ setDiet(entries[entries.length-1].diet); $("pesoin").value = entries[entries.length-1].pesoOut; }
+      renderHist();
+
+      $("btnLanc").addEventListener("click", launch);
+      $("btnPrev").addEventListener("click", ()=>{
+        const cur = $("box").value;
+        const i = SEQ.indexOf(cur);
+        $("box").value = i>0 ? SEQ[i-1] : SEQ[SEQ.length-1];
+      });
+      $("btnNext").addEventListener("click", ()=>{
+        $("box").value = nextBox($("box").value);
+      });
+      $("btnUndo").addEventListener("click", undo);
+      $("btnExport").addEventListener("click", exportCSV);
+
+      document.addEventListener("keydown", (ev)=>{
+        if(ev.key === "Enter"){ ev.preventDefault(); launch(); }
+        if(ev.ctrlKey && ev.key.toLowerCase()==="z"){ ev.preventDefault(); undo(); }
+      });
+
+      // Register SW
+      if("serviceWorker" in navigator){
+        navigator.serviceWorker.register("sw.js").catch(()=>{});
+      }
+    });
+  </script>
+</body>
+</html>
