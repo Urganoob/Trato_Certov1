@@ -7,73 +7,62 @@
   <link rel="manifest" href="manifest.webmanifest">
   <meta name="theme-color" content="#22c55e" />
   <style>
-    /* ===== Tema mais claro/nítido ===== */
+    /* ===== Tema claro/nítido (mesmo do anterior) ===== */
     :root{
-      --bg:#0f1b33;          /* antes #0b1224 */
-      --card:#1e293b;        /* antes #0f172a */
-      --text:#eaf2ff;        /* levemente mais clara */
-      --muted:#9fb0c7;
-      --accent:#22c55e;
-      --line:rgba(255,255,255,.10);
+      --bg:#0f1b33; --card:#1e293b; --text:#eaf2ff; --muted:#9fb0c7;
+      --accent:#22c55e; --line:rgba(255,255,255,.10);
     }
     html,body{height:100%}
     body{
-      margin:0;
-      background:linear-gradient(160deg,#0f1b33,#112041 60%);
-      color:var(--text);
-      font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu
+      margin:0;background:linear-gradient(160deg,#0f1b33,#112041 60%);
+      color:var(--text);font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu
     }
     .wrap{max-width:880px;margin:0 auto;padding:16px}
     .card{
-      background:rgba(30,41,59,.92);
-      backdrop-filter: blur(6px);
-      border:1px solid var(--line);
-      border-radius:16px;
-      padding:14px;
+      background:rgba(30,41,59,.92); backdrop-filter: blur(6px);
+      border:1px solid var(--line); border-radius:16px; padding:14px;
       box-shadow:0 12px 30px rgba(0,0,0,.35)
     }
     h1{font-size:20px;margin:0 0 12px}
     label{display:block;font-size:12px;color:var(--muted);margin:4px 0 4px}
-    input,select,button,textarea{
-      width:100%;
-      border-radius:12px;
-      border:1px solid var(--line);
-      background:#122347;               /* inputs um pouco mais claros */
-      color:#eaf2ff;
-      padding:12px 12px;font-size:16px;outline:none
+    input,select,button{
+      width:100%; border-radius:12px; border:1px solid var(--line);
+      background:#122347;color:#eaf2ff;padding:12px 12px;font-size:16px;outline:none
     }
-    input:focus,select:focus,textarea:focus{border-color:#4069c6;box-shadow:0 0 0 3px rgba(64,105,198,.25)}
-    .row{display:flex;gap:10px;align-items:end}
-    .row>*{flex:1}
+    input:focus,select:focus{border-color:#4069c6;box-shadow:0 0 0 3px rgba(64,105,198,.25)}
+
+    /* ===== Layout mais “mobile-first” ===== */
+    .row{display:flex;gap:10px;align-items:stretch;flex-wrap:wrap}
+    .row-main > *{min-width:250px}             /* evita ficar apertado */
+    .row-main > :first-child{flex:1.4}         /* Box maior */
+    .row-main > :last-child{flex:1}            /* Dieta */
+    @media (max-width:560px){
+      .row-main{flex-direction:column}
+      .row-actions .btn{flex:1}                /* botões ocupam linha toda no mobile */
+    }
 
     .btn{
       cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;
       padding:12px 14px;border-radius:14px;border:1px solid var(--line);background:#122347;color:#eaf2ff
     }
     .btn.primary{background:linear-gradient(180deg,#22c55e,#16a34a);border-color:transparent;color:#051b0f}
-    /* Botão Próximo bem aparente (azul forte) */
+    .btn.sm{padding:9px 10px;font-size:14px}   /* versão menor */
+    /* Próximo mais aparente (azul forte) */
     #btnNext{
       background:linear-gradient(180deg,#3b82f6,#1d4ed8);
-      border-color:transparent;
-      color:#ffffff;
-      font-weight:800;
-      letter-spacing:.2px;
+      border-color:transparent;color:#fff;font-weight:800;letter-spacing:.2px
     }
 
     .small{font-size:12px;color:var(--muted)}
     .diet{display:flex;gap:8px;flex-wrap:wrap}
     .diet input{display:none}
-    .chip{padding:9px 12px;border-radius:999px;border:1px solid var(--line);transition:filter .2s}
+    .chip{padding:12px 16px;border-radius:999px;border:1px solid var(--line);transition:filter .2s;font-size:15px}
     .chip:hover{filter:brightness(1.08)}
-
-    /* ===== Cores novas das dietas =====
-       D4 = vermelho | D3 = rosa | D2 = azul | D1 = amarelo
-    */
-    .chip-d1{ background:rgba(250,204,21,.16);  border-color:rgba(250,204,21,.55);}  /* amarelo */
-    .chip-d2{ background:rgba(96,165,250,.16);  border-color:rgba(96,165,250,.55);}  /* azul */
-    .chip-d3{ background:rgba(244,114,182,.16); border-color:rgba(244,114,182,.55);} /* rosa */
-    .chip-d4{ background:rgba(239,68,68,.16);   border-color:rgba(239,68,68,.55);}   /* vermelho */
-
+    /* Cores das dietas: D1 amarelo | D2 azul | D3 rosa | D4 vermelho */
+    .chip-d1{ background:rgba(250,204,21,.16);  border-color:rgba(250,204,21,.55);}
+    .chip-d2{ background:rgba(96,165,250,.16);  border-color:rgba(96,165,250,.55);}
+    .chip-d3{ background:rgba(244,114,182,.16); border-color:rgba(244,114,182,.55);}
+    .chip-d4{ background:rgba(239,68,68,.16);   border-color:rgba(239,68,68,.55);}
     input[name="diet"][value="D1"]:checked + .chip-d1{ background:#facc15;color:#201700;border-color:#facc15;}
     input[name="diet"][value="D2"]:checked + .chip-d2{ background:#3b82f6;color:#041021;border-color:#3b82f6;}
     input[name="diet"][value="D3"]:checked + .chip-d3{ background:#f472b6;color:#2b0e1c;border-color:#f472b6;}
@@ -85,8 +74,8 @@
     .right{text-align:right}
     .pill{display:inline-flex;gap:6px;padding:6px 10px;border-radius:999px;background:#122347;border:1px solid var(--line);font-size:12px}
 
-    /* cores do select do Box ao alternar A/B (já existia) */
-    #box{ transition: background .2s, border-color .2s; }
+    /* Aparência do select de Box conforme A/B */
+    #box{transition:background .2s,border-color .2s;padding:16px 14px;font-size:18px;height:54px}
   </style>
 </head>
 <body>
@@ -97,7 +86,7 @@
         <span class="pill"><span id="syncState">0 pendentes</span></span>
       </h1>
 
-      <div class="row">
+      <div class="row row-main">
         <div>
           <label for="box">Box</label>
           <select id="box">
@@ -133,16 +122,14 @@
         </div>
       </div>
 
-      <!-- Removido o campo Observações -->
-
-      <div class="row" style="margin-top:10px">
+      <div class="row row-actions" style="margin-top:10px">
         <button class="btn" id="btnPrev">◀️ Anterior (lança e volta)</button>
         <button class="btn primary" id="btnLanc">✅ Lançar (Enter)</button>
         <button class="btn" id="btnNext">Próximo ▶️ (lança e avança)</button>
       </div>
 
       <div class="row" style="margin-top:10px">
-        <button class="btn" id="btnExport">⬇️ Exportar CSV</button>
+        <button class="btn sm" id="btnExport">⬇️ Exportar CSV</button>
         <button class="btn" id="btnUndo">↩️ Desfazer último</button>
       </div>
 
@@ -151,7 +138,7 @@
       </div>
 
       <div style="margin-top:10px; display:flex; justify-content:flex-end">
-        <button class="btn" id="btnSync">🔄 Sincronizar agora</button>
+        <button class="btn sm" id="btnSync">🔄 Sincronizar agora</button>
       </div>
     </div>
 
@@ -162,12 +149,8 @@
         <table>
           <thead>
             <tr>
-              <th>Data</th>
-              <th>Box</th>
-              <th>Dieta</th>
-              <th class="right">Peso In</th>
-              <th class="right">Peso Out</th>
-              <th class="right">Consumo</th>
+              <th>Data</th><th>Box</th><th>Dieta</th>
+              <th class="right">Peso In</th><th class="right">Peso Out</th><th class="right">Consumo</th>
               <th></th>
             </tr>
           </thead>
@@ -180,69 +163,40 @@
   <script>
     /* ===== Config ===== */
     const $ = (id)=>document.getElementById(id);
-    const KEYS = { entries: 'trato_entries_v8_8' }; // muda a versão para forçar atualização local
+    const KEYS = { entries: 'trato_entries_v8_9' }; /* nova “versão” p/ forçar recarregar estilos */
     const SYNC_URL = "https://script.google.com/macros/s/AKfycbyzzzdUroB5jiAXgD7IvxB3bLyLx4f9GDvaDnii6uL4GhUe7XeAXH5ySl5TsCF0cR_Q/exec";
 
-    const SEQ = [
-      "A01","A02","A03","A04","A05","A06","A07","A08","A09","A10","A11","A12","A13","A14","A15","A16",
-      "B16","B15","B14","B13","B12","B11","B10","B09","B08","B07","B06","B05","B04","B03","B02","B01"
-    ];
+    const SEQ = ["A01","A02","A03","A04","A05","A06","A07","A08","A09","A10","A11","A12","A13","A14","A15","A16",
+                 "B16","B15","B14","B13","B12","B11","B10","B09","B08","B07","B06","B05","B04","B03","B02","B01"];
 
-    /* Cores alternadas do select do Box (rosa p/ A, azul p/ B) */
-    const ROSE = ['rgba(244,63,94,0.18)','rgba(251,113,133,0.18)','rgba(244,114,182,0.18)','rgba(253,164,175,0.18)'];
-    const BLUE = ['rgba(59,130,246,0.18)','rgba(96,165,250,0.18)','rgba(56,189,248,0.18)','rgba(37,99,235,0.18)'];
-    function boxColors(box){
-      const isA = box.startsWith('A');
-      const n = parseInt(box.slice(1),10);
-      const idx = isA ? (n-1) : (16 - n);
-      const bg = (isA? ROSE: BLUE)[idx % 4];
-      const border = isA ? 'rgba(244,114,182,.5)' : 'rgba(96,165,250,.5)';
-      return {bg, border};
-    }
-    function paintBoxSelect(){
-      const sel = $("box");
-      const v = sel.value || SEQ[0];
-      const c = boxColors(v);
-      sel.style.background = `linear-gradient(0deg, ${c.bg}, ${c.bg})`;
-      sel.style.borderColor = c.border;
-    }
-    function paintBoxOptions(){
-      const sel = $("box");
-      [...sel.options].forEach(opt=>{
-        const c = boxColors(opt.value);
-        opt.style.background = c.bg;
-        opt.style.color = '#eaf2ff';
-      });
-    }
+    /* Cores do select do Box */
+    const ROSE=['rgba(244,63,94,0.18)','rgba(251,113,133,0.18)','rgba(244,114,182,0.18)','rgba(253,164,175,0.18)'];
+    const BLUE=['rgba(59,130,246,0.18)','rgba(96,165,250,0.18)','rgba(56,189,248,0.18)','rgba(37,99,235,0.18)'];
+    function boxColors(box){ const isA=box.startsWith('A'); const n=parseInt(box.slice(1),10); const idx=isA?(n-1):(16-n);
+      return { bg:(isA?ROSE:BLUE)[idx%4], border:isA?'rgba(244,114,182,.5)':'rgba(96,165,250,.5)' }; }
+    function paintBoxSelect(){ const sel=$("box"); const v=sel.value||SEQ[0]; const c=boxColors(v);
+      sel.style.background=`linear-gradient(0deg, ${c.bg}, ${c.bg})`; sel.style.borderColor=c.border; }
+    function paintBoxOptions(){ const sel=$("box"); [...sel.options].forEach(opt=>{ const c=boxColors(opt.value); opt.style.background=c.bg; opt.style.color='#eaf2ff'; }); }
 
     /* Data/hora TO */
     function nowBR(){
-      try{
-        const fmt = new Intl.DateTimeFormat('pt-BR',{ timeZone:'America/Araguaina', year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', second:'2-digit'});
-        const parts = fmt.formatToParts(new Date());
-        const get = (t)=>parts.find(p=>p.type===t).value;
-        const dia = `${get('day')}/${get('month')}/${get('year')}`;
-        const hora = `${get('hour')}:${get('minute')}:${get('second')}`;
+      try{ const fmt=new Intl.DateTimeFormat('pt-BR',{timeZone:'America/Araguaina',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit'});
+        const parts=fmt.formatToParts(new Date()); const get=t=>parts.find(p=>p.type===t).value;
+        const dia=`${get('day')}/${get('month')}/${get('year')}`; const hora=`${get('hour')}:${get('minute')}:${get('second')}`;
         return {iso:new Date().toISOString(), dia, hora, both:`${dia} ${hora}`};
-      }catch(e){
-        const d=new Date(); const pad=n=>String(n).padStart(2,'0');
-        const dia=`${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()}`;
-        const hora=`${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
-        return {iso:d.toISOString(), dia, hora, both:`${dia} ${hora}`};
-      }
+      }catch(e){ const d=new Date(),pad=n=>String(n).padStart(2,'0');
+        const dia=`${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()}`; const hora=`${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+        return {iso:d.toISOString(), dia, hora, both:`${dia} ${hora}`}; }
     }
 
     /* Storage */
     function loadEntries(){ try{ return JSON.parse(localStorage.getItem(KEYS.entries)||'[]')||[]; }catch{ return []; } }
     function saveEntries(v){ localStorage.setItem(KEYS.entries, JSON.stringify(v)); }
     let entries = loadEntries();
-
     (function migrate(){
       if(entries.length) return;
-      const keys = ['trato_entries_v8_7','trato_entries_v8_6','trato_entries_v8_5','trato_entries_v8_4','trato_entries_v8_3','trato_entries_v8_2','trato_entries_v8_1','trato_entries_v8','trato_entries_v7','trato_entries_v6','trato_entries'];
-      for(const k of keys){
-        try{ const arr = JSON.parse(localStorage.getItem(k)||'[]'); if(Array.isArray(arr) && arr.length){ entries = arr; saveEntries(entries); break; } }catch{}
-      }
+      const keys=['trato_entries_v8_8','trato_entries_v8_7','trato_entries_v8_6','trato_entries_v8_5','trato_entries_v8_4','trato_entries_v8_3','trato_entries_v8_2','trato_entries_v8_1','trato_entries_v8','trato_entries_v7','trato_entries_v6','trato_entries'];
+      for(const k of keys){ try{ const arr=JSON.parse(localStorage.getItem(k)||'[]'); if(Array.isArray(arr)&&arr.length){ entries=arr; saveEntries(entries); break; } }catch{} }
     })();
 
     /* Online/offline */
@@ -252,16 +206,10 @@
 
     /* UI */
     function populateBoxes(){
-      const sel = $("box");
-      if(entries.length){
-        const last = entries[entries.length-1];
-        const idx = (SEQ.indexOf(last.box)+1) % SEQ.length;
-        sel.value = SEQ[idx];
-      }else{
-        sel.value = SEQ[0];
-      }
-      paintBoxOptions(); paintBoxSelect();
-      sel.addEventListener('change', paintBoxSelect);
+      const sel=$("box");
+      if(entries.length){ const last=entries[entries.length-1]; const idx=(SEQ.indexOf(last.box)+1)%SEQ.length; sel.value=SEQ[idx]; }
+      else { sel.value=SEQ[0]; }
+      paintBoxOptions(); paintBoxSelect(); sel.addEventListener('change', paintBoxSelect);
     }
     function setDiet(v){ document.querySelector(`input[name="diet"][value="${v}"]`)?.click(); }
     function getDiet(){ const r=document.querySelector('input[name="diet"]:checked'); return r? r.value : ""; }
@@ -271,28 +219,22 @@
     const fmt = (n)=>Number(n).toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1});
 
     function renderHist(){
-      const tb = $("hist"); tb.innerHTML = "";
-      const view = entries.slice(-100).reverse();
+      const tb=$("hist"); tb.innerHTML=""; const view=entries.slice(-100).reverse();
       for(const r of view){
-        const tr = document.createElement("tr");
-        const syncBadge = r.synced ? "" : " <span class='small' style='color:#fbbf24'>(pendente)</span>";
-        const cells = [
-          `${r.dia} ${r.hora}`,
-          r.box, r.diet + syncBadge,
-          `<span class="right">${fmt(r.pesoIn)}</span>`,
-          `<span class="right">${fmt(r.pesoOut)}</span>`,
-          `<span class="right">${fmt(r.consumo)}</span>`,
-          `<button class="btn" data-del="${r.id}">Excluir</button>`
-        ];
+        const tr=document.createElement("tr");
+        const syncBadge=r.synced?"":" <span class='small' style='color:#fbbf24'>(pendente)</span>";
+        const cells=[ `${r.dia} ${r.hora}`, r.box, r.diet+syncBadge,
+          `<span class="right">${fmt(r.pesoIn)}</span>`, `<span class="right">${fmt(r.pesoOut)}</span>`, `<span class="right">${fmt(r.consumo)}</span>`,
+          `<button class="btn" data-del="${r.id}">Excluir</button>` ];
         for(const c of cells){ const td=document.createElement("td"); td.innerHTML=c; tr.appendChild(td); }
         tb.appendChild(tr);
       }
-      $("histInfo").textContent = `${entries.length} lançamento(s)`;
-      $("syncState").textContent = entries.filter(x=>!x.synced).length + " pendentes";
+      $("histInfo").textContent=`${entries.length} lançamento(s)`;
+      $("syncState").textContent=entries.filter(x=>!x.synced).length+" pendentes";
     }
 
     function validate(){
-      const box=$("box").value; const diet=getDiet();
+      const box=$("box").value,diet=getDiet();
       const pin=parseFloat(($("pesoin").value||"").replace(',','.'));
       const pout=parseFloat(($("pesoout").value||"").replace(',','.'));
       const msg=[];
@@ -300,73 +242,50 @@
       if(!diet) msg.push("Selecione a dieta");
       if(!Number.isFinite(pin)) msg.push("Peso inicial inválido");
       if(!Number.isFinite(pout)) msg.push("Peso final inválido");
-      if(Number.isFinite(pin) && Number.isFinite(pout) && !(pout < pin)) msg.push("Peso final deve ser MENOR que o inicial");
-      return {ok: msg.length===0, msg: msg.join("\n")};
+      if(Number.isFinite(pin)&&Number.isFinite(pout)&&!(pout<pin)) msg.push("Peso final deve ser MENOR que o inicial");
+      return {ok:msg.length===0,msg:msg.join("\n")};
     }
 
     function buildRow(){
       const pin=parseFloat(($("pesoin").value||"").replace(',','.'));
       const pout=parseFloat(($("pesoout").value||"").replace(',','.'));
       const t=nowBR();
-      return {
-        id: (crypto?.randomUUID?.() || (Date.now().toString(36)+Math.random().toString(36).slice(2))),
-        iso:t.iso, dia:t.dia, hora:t.hora,
-        box:$("box").value, diet:getDiet(),
-        pesoIn:pin, pesoOut:pout, consumo:+(pin-pout).toFixed(1),
-        synced:false
-      };
+      return { id:(crypto?.randomUUID?.()||(Date.now().toString(36)+Math.random().toString(36).slice(2))),
+        iso:t.iso,dia:t.dia,hora:t.hora, box:$("box").value,diet:getDiet(), pesoIn:pin,pesoOut:pout,consumo:+(pin-pout).toFixed(1), synced:false };
     }
 
-    function postLaunchAdjust(row, move='stay'){
-      $("pesoin").value = String(row.pesoOut);
-      $("pesoout").value = "";
-      if(move==='next') $("box").value = nextBox(row.box);
-      if(move==='prev') $("box").value = prevBox(row.box);
-      renderNow(); $("pesoout").focus(); if('vibrate' in navigator) navigator.vibrate(15);
-      paintBoxSelect();
+    function postLaunchAdjust(row,move='stay'){
+      $("pesoin").value=String(row.pesoOut); $("pesoout").value="";
+      if(move==='next') $("box").value=nextBox(row.box);
+      if(move==='prev') $("box").value=prevBox(row.box);
+      renderNow(); $("pesoout").focus(); if('vibrate' in navigator) navigator.vibrate(15); paintBoxSelect();
     }
 
-    /* ===== Sync (sem header p/ evitar preflight) ===== */
-    async function syncOne(url, r){
-      try{
-        const res = await fetch(url, { method:'POST', body: JSON.stringify(r) });
-        const txt = await res.text();
-        let data = null; try{ data = JSON.parse(txt); }catch(_){}
-        return !!(data && data.ok === true);
-      }catch{ return false; }
+    /* Sync sem header (evita preflight) */
+    async function syncOne(url,r){
+      try{ const res=await fetch(url,{method:'POST',body:JSON.stringify(r)}); const txt=await res.text(); let data=null; try{data=JSON.parse(txt);}catch{}; return !!(data&&data.ok===true);
+      }catch{return false;}
     }
     async function syncPending(){
-      if(!navigator.onLine) return;
-      let ok=0, fail=0;
-      for(const r of entries){
-        if(r.synced) continue;
-        const s = await syncOne(SYNC_URL, r);
-        if(s){ r.synced = true; ok++; saveEntries(entries); renderHist(); } else { fail++; }
-      }
+      if(!navigator.onLine) return; let ok=0,fail=0;
+      for(const r of entries){ if(r.synced) continue; const s=await syncOne(SYNC_URL,r); if(s){ r.synced=true; ok++; saveEntries(entries); renderHist(); } else { fail++; } }
       alert(`Sincronização concluída. Sucesso: ${ok} • Falhas: ${fail}`);
     }
     function autoSync(){ if(navigator.onLine) syncPending(); }
 
-    /* Ações */
-    function launch(move='stay'){
-      const v=validate(); if(!v.ok){ alert(v.msg); return false; }
-      const row=buildRow(); entries.push(row); saveEntries(entries); renderHist(); postLaunchAdjust(row,move); autoSync(); return true;
-    }
+    function launch(move='stay'){ const v=validate(); if(!v.ok){ alert(v.msg); return false; }
+      const row=buildRow(); entries.push(row); saveEntries(entries); renderHist(); postLaunchAdjust(row,move); autoSync(); return true; }
     function undo(){
-      if(!entries.length) return;
-      const last=entries[entries.length-1];
+      if(!entries.length) return; const last=entries[entries.length-1];
       if(!confirm(`Desfazer último lançamento (${last.box} / ${last.diet})?`)) return;
       entries.pop(); saveEntries(entries); renderHist();
-      $("box").value=last.box; setDiet(last.diet);
-      $("pesoin").value=last.pesoIn; $("pesoout").value=last.pesoOut;
-      paintBoxSelect();
+      $("box").value=last.box; document.querySelector(`input[name="diet"][value="${last.diet}"]`)?.click();
+      $("pesoin").value=last.pesoIn; $("pesoout").value=last.pesoOut; paintBoxSelect();
     }
     function exportCSV(){
       const header=['iso','dia','hora','box','dieta','peso_inicial','peso_final','consumo','synced'];
       const lines=[header.join(';')];
-      for(const r of entries){
-        lines.push([r.iso,r.dia,r.hora,r.box,r.diet,r.pesoIn,r.pesoOut,r.consumo,r.synced?1:0].join(';'));
-      }
+      for(const r of entries){ lines.push([r.iso,r.dia,r.hora,r.box,r.diet,r.pesoIn,r.pesoOut,r.consumo,r.synced?1:0].join(';')); }
       const blob=new Blob(['\ufeff'+lines.join('\n')],{type:'text/csv;charset=utf-8'});
       const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='trato_certo.csv'; a.click();
       setTimeout(()=>URL.revokeObjectURL(a.href),500);
@@ -374,7 +293,7 @@
 
     document.addEventListener("DOMContentLoaded", ()=>{
       setNet(); populateBoxes(); renderNow();
-      if(entries.length){ setDiet(entries[entries.length-1].diet); $("pesoin").value=entries[entries.length-1].pesoOut; }
+      if(entries.length){ document.querySelector(`input[name="diet"][value="${entries[entries.length-1].diet}"]`)?.click(); $("pesoin").value=entries[entries.length-1].pesoOut; }
       renderHist();
 
       $("btnLanc").addEventListener("click", ()=>launch('stay'));
@@ -384,21 +303,14 @@
       $("btnExport").addEventListener("click", exportCSV);
       $("btnSync").addEventListener("click", syncPending);
 
-      document.addEventListener("keydown", (ev)=>{
-        if(ev.key==='Enter'){ ev.preventDefault(); launch('stay'); }
-        if(ev.ctrlKey && ev.key.toLowerCase()==='z'){ ev.preventDefault(); undo(); }
-      });
+      document.addEventListener("keydown",(ev)=>{ if(ev.key==='Enter'){ ev.preventDefault(); launch('stay'); } if(ev.ctrlKey&&ev.key.toLowerCase()==='z'){ ev.preventDefault(); undo(); } });
 
-      if('serviceWorker' in navigator){
-        navigator.serviceWorker.register('sw.js').catch(()=>{});
-      }
+      if('serviceWorker' in navigator){ navigator.serviceWorker.register('sw.js').catch(()=>{}); }
       setTimeout(autoSync,800);
     });
 
-    document.body.addEventListener('click', (e)=>{
-      const btn=e.target.closest('[data-del]'); if(!btn) return;
-      const id=btn.getAttribute('data-del');
-      const idx=entries.findIndex(x=>x.id===id);
+    document.body.addEventListener('click',(e)=>{ const btn=e.target.closest('[data-del]'); if(!btn) return;
+      const id=btn.getAttribute('data-del'); const idx=entries.findIndex(x=>x.id===id);
       if(idx>-1 && confirm('Excluir este lançamento?')){ entries.splice(idx,1); saveEntries(entries); renderHist(); }
     });
   </script>
