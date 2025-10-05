@@ -1,4 +1,4 @@
-const CACHE_NAME = "trato-certo-v8.2";
+const CACHE_NAME = "trato-certo-v8.4";
 const ASSETS = [
   "./",
   "./index.html",
@@ -18,6 +18,6 @@ self.addEventListener("activate", (event) => {
 });
 self.addEventListener("fetch", (event) => {
   event.respondWith(
-    caches.match(event.request).then(cached => cached || fetch(event.request).then(r => r).catch(() => cached))
+    caches.match(event.request).then(cached => cached || fetch(event.request).catch(() => cached))
   );
 });

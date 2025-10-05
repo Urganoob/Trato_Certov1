@@ -40,12 +40,7 @@
     th{font-weight:600;text-align:left;font-size:12px;color:#9fb0c7}
     td{background:#0b1224;border:1px solid var(--line);border-left:none;border-right:none;padding:10px 12px}
     .right{text-align:right}
-    .muted{color:#94a3b8}
-    .ok{color:#86efac}
-    .warn{color:#fbbf24}
-    .bad{color:#fca5a5}
     .pill{display:inline-flex;gap:6px;padding:6px 10px;border-radius:999px;background:#0b1224;border:1px solid var(--line);font-size:12px}
-
     #box{ transition: background .2s, border-color .2s; }
   </style>
 </head>
@@ -60,9 +55,8 @@
       <div class="row">
         <div>
           <label for="box">Box</label>
-          <!-- HARD-CODED OPTIONS (sempre aparecem) -->
           <select id="box">
-            <option value="A01">A01</option>
+<option value="A01">A01</option>
 <option value="A02">A02</option>
 <option value="A03">A03</option>
 <option value="A04">A04</option>
@@ -134,7 +128,7 @@
         <button class="btn" id="btnUndo">↩️ Desfazer último</button>
       </div>
 
-      <div class="small muted" id="dateTiny" style="text-align:right;margin-top:8px">
+      <div class="small" id="dateTiny" style="text-align:right;margin-top:8px;color:#94a3b8">
         Data/Hora: <span id="dateTinyVal"></span>
       </div>
 
@@ -145,7 +139,7 @@
 
     <div class="card" style="margin-top:16px">
       <h1 style="font-size:16px">Histórico</h1>
-      <div class="small muted" id="histInfo">0 lançamento(s)</div>
+      <div class="small" id="histInfo" style="color:#94a3b8">0 lançamento(s)</div>
       <div style="overflow:auto">
         <table>
           <thead>
@@ -168,17 +162,15 @@
 
   <script>
     const $ = (id)=>document.getElementById(id);
-    const KEYS = {entries:'trato_entries_v8_2'};
-    const SYNC_URL = ""https://script.google.com/macros/s/AKfycbxbpDQxHjonqd-Lc8SobZxV0Jq9WP5k9Blt_GFzRFAIChSkuHcnUJMOrwIc9PWwGdx9lg/exec"";   // oculto da UI
-    const TOKEN    = ""ASG05102025"";      // token escolhido
+    const KEYS = {entries:'trato_entries_v8_4'};
+    const SYNC_URL = "https://script.google.com/macros/s/AKfycbxbpDQxHjonqd-Lc8SobZxV0Jq9WP5k9Blt_GFzRFAIChSkuHcnUJMOrwIc9PWwGdx9lg/exec";
+    const TOKEN    = "ASG05102025";
 
-    // Lista que o JS também conhece (mas **não** apaga as <option> já no HTML)
     const SEQ = [
       "A01","A02","A03","A04","A05","A06","A07","A08","A09","A10","A11","A12","A13","A14","A15","A16",
       "B16","B15","B14","B13","B12","B11","B10","B09","B08","B07","B06","B05","B04","B03","B02","B01"
     ];
 
-    // Paletas (rosa para A, azul para B)
     const ROSE = ['rgba(244,63,94,0.18)','rgba(251,113,133,0.18)','rgba(244,114,182,0.18)','rgba(253,164,175,0.18)'];
     const BLUE = ['rgba(59,130,246,0.18)','rgba(96,165,250,0.18)','rgba(56,189,248,0.18)','rgba(37,99,235,0.18)'];
     function boxColors(box){
@@ -223,96 +215,49 @@
     }
 
     function loadEntries(){
-      try{
-        const v = JSON.parse(localStorage.getItem(KEYS.entries)||'[]');
-        return Array.isArray(v) ? v : [];
-      }catch{return []}
+      try{ return JSON.parse(localStorage.getItem(KEYS.entries)||'[]')||[]; }catch{ return []; }
     }
     function saveEntries(v){ localStorage.setItem(KEYS.entries, JSON.stringify(v)); }
     let entries = loadEntries();
 
-    // Migration from older keys
-    ;(()=>{
+    (function migrate(){
       if(entries.length) return;
-      const keys = ['trato_entries_v8_1','trato_entries_v8','trato_entries_v7','trato_entries_v6','trato_entries_v5','trato_entries_v4','trato_entries_v3','trato_entries_v2','trato_entries']; 
+      const keys = ['trato_entries_v8_2','trato_entries_v8_1','trato_entries_v8','trato_entries_v7','trato_entries_v6','trato_entries_v5','trato_entries_v4','trato_entries_v3','trato_entries_v2','trato_entries'];
       for(const k of keys){
-        try{
-          const raw = localStorage.getItem(k);
-          if(!raw) continue;
-          const arr = JSON.parse(raw)||[];
-          if(Array.isArray(arr) && arr.length){
-            entries = arr.map(r=>{
-              const consumo = 'consumo' in r ? r.consumo : (('liq' in r) ? r.liq : (r.pesoIn - r.pesoOut));
-              return {...r, consumo: +(+consumo).toFixed(1), synced: !!r.synced};
-            });
-            saveEntries(entries);
-            break;
-          }
-        }catch{}
+        try{ const arr = JSON.parse(localStorage.getItem(k)||'[]'); if(Array.isArray(arr) && arr.length){ entries = arr; saveEntries(entries); break; } }catch{}
       }
     })();
 
-    function setNet(){
-      $("net").textContent = navigator.onLine ? "• online" : "• offline";
-    }
+    function setNet(){ $("net").textContent = navigator.onLine ? "• online" : "• offline"; }
     window.addEventListener('online', ()=>{ setNet(); autoSync(); });
     window.addEventListener('offline', setNet);
 
     function populateBoxes(){
       const sel = $("box");
-      // NÃO esvazia o select se já houver opções (hardcoded no HTML)
       if(sel.options.length === 0){
-        for(const b of SEQ){
-          const opt = document.createElement("option");
-          opt.value = b; opt.textContent = b;
-          sel.appendChild(opt);
-        }
+        for(const b of SEQ){ const o=document.createElement('option'); o.value=b; o.textContent=b; sel.appendChild(o); }
       }
-      if(entries.length){
-        const last = entries[entries.length-1];
-        const idx = (SEQ.indexOf(last.box)+1) % SEQ.length;
-        sel.value = SEQ[idx];
-      }else{
-        sel.value = SEQ[0];
-      }
-      paintBoxOptions();
-      paintBoxSelect();
+      if(entries.length){ const last=entries[entries.length-1]; const idx=(SEQ.indexOf(last.box)+1)%SEQ.length; sel.value=SEQ[idx]; }
+      else { sel.value = SEQ[0]; }
+      paintBoxOptions(); paintBoxSelect();
       sel.addEventListener('change', paintBoxSelect);
     }
 
-    function setDiet(v){
-      const r = document.querySelector(`input[name="diet"][value="${v}"]`);
-      if(r) r.checked = true;
-    }
-    function getDiet(){
-      const r = document.querySelector('input[name="diet"]:checked');
-      return r ? r.value : "";
-    }
+    function getDiet(){ const r=document.querySelector('input[name="diet"]:checked'); return r? r.value : ""; }
 
-    function renderNow(){ 
-      const t = nowBR(); 
-      $("dateTinyVal").textContent = t.both; 
-    }
+    function renderNow(){ const t = nowBR(); $("dateTinyVal").textContent = t.both; }
 
-    function nextBox(cur){
-      const i = SEQ.indexOf(cur);
-      if(i<0) return SEQ[0];
-      return SEQ[(i+1)%SEQ.length];
-    }
-    function prevBox(cur){
-      const i = SEQ.indexOf(cur);
-      if(i<0) return SEQ[0];
-      return i>0 ? SEQ[i-1] : SEQ[SEQ.length-1];
-    }
+    function nextBox(cur){ const i=SEQ.indexOf(cur); return i<0? SEQ[0] : SEQ[(i+1)%SEQ.length]; }
+    function prevBox(cur){ const i=SEQ.indexOf(cur); return i<0? SEQ[0] : (i>0? SEQ[i-1] : SEQ[SEQ.length-1]); }
 
-    function fmt(n){ return Number(n).toLocaleString('pt-BR', {minimumFractionDigits:1, maximumFractionDigits:1}); }
+    const fmt = (n)=>Number(n).toLocaleString('pt-BR', {minimumFractionDigits:1, maximumFractionDigits:1});
 
     function renderHist(){
       const tb = $("hist"); tb.innerHTML = "";
       const view = entries.slice(-100).reverse();
       for(const r of view){
         const tr = document.createElement("tr");
-        const syncBadge = r.synced ? "" : " <span class='small warn'>(pendente)</span>";
+        const syncBadge = r.synced ? "" : " <span class='small' style='color:#fbbf24'>(pendente)</span>";
         const cells = [
           `${r.dia} ${r.hora}`,
           r.box, r.diet + syncBadge,
@@ -326,167 +271,73 @@
         tb.appendChild(tr);
       }
       $("histInfo").textContent = `${entries.length} lançamento(s)`;
-      const pend = entries.filter(x=>!x.synced).length;
-      $("syncState").textContent = pend + " pendentes";
+      $("syncState").textContent = entries.filter(x=>!x.synced).length + " pendentes";
     }
 
     function validate(){
-      const box = $("box").value;
-      const diet = getDiet();
-      const pin = parseFloat($("pesoin").value.replace(',','.'));
-      const pout = parseFloat($("pesoout").value.replace(',','.'));
-      let msg = [];
+      const box=$("box").value; const diet=getDiet();
+      const pin=parseFloat(($("pesoin").value||"").replace(',','.'));
+      const pout=parseFloat(($("pesoout").value||"").replace(',','.'));
+      const msg=[];
       if(!box) msg.push("Selecione o box");
       if(!diet) msg.push("Selecione a dieta");
       if(!Number.isFinite(pin)) msg.push("Peso inicial inválido");
       if(!Number.isFinite(pout)) msg.push("Peso final inválido");
-      if(Number.isFinite(pin) && Number.isFinite(pout) && !(pout < pin)){
-        msg.push("Peso final deve ser MENOR que o inicial");
-      }
-      return {ok:msg.length===0, msg: msg.join("\n")};
+      if(Number.isFinite(pin) && Number.isFinite(pout) && !(pout < pin)) msg.push("Peso final deve ser MENOR que o inicial");
+      return {ok: msg.length===0, msg: msg.join("\n")};
     }
 
     function buildRow(){
-      const diet = getDiet();
-      const pin = parseFloat($("pesoin").value.replace(',','.'));
-      const pout = parseFloat($("pesoout").value.replace(',','.'));
-      const consumo = +(pin - pout).toFixed(1);
-      const t = nowBR();
+      const pin=parseFloat(($("pesoin").value||"").replace(',','.'));
+      const pout=parseFloat(($("pesoout").value||"").replace(',','.'));
+      const t=nowBR();
       return {
         id: (crypto?.randomUUID?.() || (Date.now().toString(36)+Math.random().toString(36).slice(2))),
-        iso: t.iso, dia: t.dia, hora: t.hora,
-        box: $("box").value,
-        diet, pesoIn: pin, pesoOut: pout, consumo,
+        iso:t.iso, dia:t.dia, hora:t.hora,
+        box:$("box").value, diet:getDiet(),
+        pesoIn:pin, pesoOut:pout, consumo:+(pin-pout).toFixed(1),
         obs: $("obs").value.trim(),
-        synced: false
+        synced:false
       };
     }
 
-    function postLaunchAdjust(row, move='stay'){
-      $("pesoin").value = String(row.pesoOut);
-      $("pesoout").value = "";
-      $("obs").value = "";
+    function postLaunchAdjust(row, move='stay'){ 
+      $("pesoin").value = String(row.pesoOut); $("pesoout").value=""; $("obs").value="";
       if(move==='next') $("box").value = nextBox(row.box);
       if(move==='prev') $("box").value = prevBox(row.box);
-      renderNow();
-      $("pesoout").focus();
-      if('vibrate' in navigator) navigator.vibrate(15);
-      paintBoxSelect();
+      renderNow(); $("pesoout").focus(); if('vibrate' in navigator) navigator.vibrate(15); paintBoxSelect();
     }
 
     async function syncOne(url, r){
-      try{
-        const res = await fetch(url, {
-          method:'POST',
-          headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({ ...r, token: TOKEN })
-        });
-        let ok=false;
-        try{
-          const data = await res.json();
-          ok = !!(data && data.ok===true);
-        }catch(_){ ok=false; }
-        return ok;
+      try{ 
+        const res = await fetch(url, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({...r, token:TOKEN})});
+        const data = await res.json().catch(()=>({}));
+        return !!(data && data.ok===true);
       }catch(e){ return false; }
     }
 
     async function syncPending(){
-      const url = SYNC_URL;
-      if(!url) { return; }
-      if(!navigator.onLine){ return; }
-      let ok=0, fail=0;
-      for(const r of entries){
-        if(r.synced) continue;
-        const s = await syncOne(url, r);
-        if(s){ r.synced = true; ok++; saveEntries(entries); renderHist(); }
-        else { fail++; }
-      }
-      const msg = `Sincronização concluída. Sucesso: ${ok} • Falhas: ${fail}`;
-      alert(msg);
-    }
-
-    function autoSync(){
-      const url = SYNC_URL;
-      if(!url) return;
       if(!navigator.onLine) return;
-      syncPending();
+      let ok=0, fail=0;
+      for(const r of entries){ if(r.synced) continue; const s=await syncOne(SYNC_URL, r); if(s){ r.synced=true; ok++; saveEntries(entries); renderHist(); } else fail++; }
+      alert(`Sincronização concluída. Sucesso: ${ok} • Falhas: ${fail}`);
     }
 
-    function launch(move='stay'){
-      const v = validate();
-      if(!v.ok){ alert(v.msg); return false; }
-      const row = buildRow();
-      entries.push(row); saveEntries(entries);
-      renderHist();
-      postLaunchAdjust(row, move);
-      autoSync();
-      return true;
-    }
+    function autoSync(){ if(navigator.onLine) syncPending(); }
 
-    function undo(){
-      if(!entries.length) return;
-      const last = entries[entries.length-1];
-      if(!confirm(`Desfazer último lançamento (${last.box} / ${last.diet})?`)) return;
-      entries.pop(); saveEntries(entries); renderHist();
-      document.getElementById("box").value = last.box;
-      document.querySelector(`input[name="diet"][value="${last.diet}"]`).checked = true;
-      document.getElementById("pesoin").value = last.pesoIn;
-      document.getElementById("pesoout").value = last.pesoOut;
-      document.getElementById("obs").value = last.obs||"";
-      paintBoxSelect();
-    }
+    function launch(move='stay'){ const v=validate(); if(!v.ok){ alert(v.msg); return false; } const row=buildRow(); entries.push(row); saveEntries(entries); renderHist(); postLaunchAdjust(row,move); autoSync(); return true; }
+    function undo(){ if(!entries.length) return; const last=entries[entries.length-1]; if(!confirm(`Desfazer último lançamento (${last.box} / ${last.diet})?`)) return; entries.pop(); saveEntries(entries); renderHist(); $("box").value=last.box; document.querySelector(`input[name="diet"][value="${last.diet}"]`)?.click(); $("pesoin").value=last.pesoIn; $("pesoout").value=last.pesoOut; $("obs").value=last.obs||""; paintBoxSelect(); }
+    function exportCSV(){ const header=['iso','dia','hora','box','dieta','peso_inicial','peso_final','consumo','obs','synced']; const lines=[header.join(';')]; for(const r of entries) lines.push([r.iso,r.dia,r.hora,r.box,r.diet,r.pesoIn,r.pesoOut,r.consumo,(r.obs||'').replaceAll(';',','),r.synced?1:0].join(';')); const blob=new Blob(['\ufeff'+lines.join('\n')],{type:'text/csv;charset=utf-8'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='trato_certo.csv'; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),500); }
 
-    function exportCSV(){
-      const header = ['iso','dia','hora','box','dieta','peso_inicial','peso_final','consumo','obs','synced'];
-      const lines = [header.join(';')];
-      for(const r of entries){
-        lines.push([r.iso,r.dia,r.hora,r.box,r.diet,r.pesoIn,r.pesoOut,r.consumo,(r.obs||'').replaceAll(';',','), r.synced?1:0].join(';'));
-      }
-      const blob = new Blob(["\ufeff"+lines.join("\n")], {type:"text/csv;charset=utf-8"});
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = "trato_certo.csv";
-      a.click();
-      setTimeout(()=>URL.revokeObjectURL(a.href), 500);
-    }
-
-    document.addEventListener("DOMContentLoaded", ()=>{
-      setNet();
-      populateBoxes();   // usa opções do HTML; só preenche se tiver 0
-      renderNow();
-      if(entries.length){ 
-        document.querySelector(`input[name="diet"][value="${entries[entries.length-1].diet}"]`)?.click();
-        document.getElementById("pesoin").value = entries[entries.length-1].pesoOut; 
-      }
-      renderHist();
-
-      document.getElementById("btnLanc").addEventListener("click", ()=>launch('stay'));
-      document.getElementById("btnPrev").addEventListener("click", ()=>{ if(launch('prev')){} });
-      document.getElementById("btnNext").addEventListener("click", ()=>{ if(launch('next')){} });
-      document.getElementById("btnUndo").addEventListener("click", undo);
-      document.getElementById("btnExport").addEventListener("click", exportCSV);
-      document.getElementById("btnSync").addEventListener("click", syncPending);
-
-      document.addEventListener("keydown", (ev)=>{
-        if(ev.key === "Enter"){ ev.preventDefault(); launch('stay'); }
-        if(ev.ctrlKey && ev.key.toLowerCase()==="z"){ ev.preventDefault(); undo(); }
-      });
-
-      if("serviceWorker" in navigator){
-        navigator.serviceWorker.register("sw.js").catch(()=>{});
-      }
-
-      setTimeout(autoSync, 800);
+    document.addEventListener("DOMContentLoaded", ()=>{ 
+      setNet(); populateBoxes(); renderNow(); if(entries.length){ document.querySelector(`input[name="diet"][value="${entries[entries.length-1].diet}"]`)?.click(); $("pesoin").value=entries[entries.length-1].pesoOut; } renderHist();
+      $("btnLanc").addEventListener("click", ()=>launch('stay')); $("btnPrev").addEventListener("click", ()=>{ if(launch('prev')){} }); $("btnNext").addEventListener("click", ()=>{ if(launch('next')){} }); $("btnUndo").addEventListener("click", undo); $("btnExport").addEventListener("click", exportCSV); $("btnSync").addEventListener("click", syncPending);
+      document.addEventListener("keydown", (ev)=>{ if(ev.key==='Enter'){ ev.preventDefault(); launch('stay'); } if(ev.ctrlKey && ev.key.toLowerCase()==='z'){ ev.preventDefault(); undo(); } });
+      if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+      setTimeout(autoSync,800);
     });
 
-    document.body.addEventListener('click', (e)=>{
-      const btn = e.target.closest('[data-del]'); if(!btn) return;
-      const id = btn.getAttribute('data-del');
-      const idx = entries.findIndex(x=>x.id===id);
-      if(idx>-1 && confirm("Excluir este lançamento?")){
-        entries.splice(idx,1); saveEntries(entries); renderHist();
-      }
-    });
+    document.body.addEventListener('click', (e)=>{ const btn=e.target.closest('[data-del]'); if(!btn) return; const id=btn.getAttribute('data-del'); const idx=entries.findIndex(x=>x.id===id); if(idx>-1 && confirm('Excluir este lançamento?')){ entries.splice(idx,1); saveEntries(entries); renderHist(); } });
   </script>
 </body>
 </html>

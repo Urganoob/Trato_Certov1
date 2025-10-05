@@ -2,10 +2,11 @@
   "name": "ASG – Trato Certo",
   "short_name": "Trato Certo",
   "start_url": ".",
+  "scope": ".",
   "display": "standalone",
   "background_color": "#0b1224",
   "theme_color": "#22c55e",
-  "description": "Lançamento por box (A01..A16, B16..B01). Offline-first, exporta CSV e sincroniza quando online.",
+  "description": "Lançamento por box (A01..A16, B16..B01). Offline-first com sincronização.",
   "icons": [
     {
       "src": "icons/icon-192.png",
