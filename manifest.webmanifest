@@ -1,24 +1,12 @@
 {
   "name": "ASG – Trato Certo",
   "short_name": "Trato Certo",
-  "start_url": ".",
-  "scope": ".",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#0b1224",
   "theme_color": "#22c55e",
-  "description": "Lançamento por box (A01..A16, B16..B01). Offline-first com sincronização.",
   "icons": [
-    {
-      "src": "icons/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "icons/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
-    }
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" }
   ]
 }

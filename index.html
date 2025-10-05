@@ -56,38 +56,38 @@
         <div>
           <label for="box">Box</label>
           <select id="box">
-<option value="A01">A01</option>
-<option value="A02">A02</option>
-<option value="A03">A03</option>
-<option value="A04">A04</option>
-<option value="A05">A05</option>
-<option value="A06">A06</option>
-<option value="A07">A07</option>
-<option value="A08">A08</option>
-<option value="A09">A09</option>
-<option value="A10">A10</option>
-<option value="A11">A11</option>
-<option value="A12">A12</option>
-<option value="A13">A13</option>
-<option value="A14">A14</option>
-<option value="A15">A15</option>
-<option value="A16">A16</option>
-<option value="B16">B16</option>
-<option value="B15">B15</option>
-<option value="B14">B14</option>
-<option value="B13">B13</option>
-<option value="B12">B12</option>
-<option value="B11">B11</option>
-<option value="B10">B10</option>
-<option value="B09">B09</option>
-<option value="B08">B08</option>
-<option value="B07">B07</option>
-<option value="B06">B06</option>
-<option value="B05">B05</option>
-<option value="B04">B04</option>
-<option value="B03">B03</option>
-<option value="B02">B02</option>
-<option value="B01">B01</option>
+            <option value="A01">A01</option>
+            <option value="A02">A02</option>
+            <option value="A03">A03</option>
+            <option value="A04">A04</option>
+            <option value="A05">A05</option>
+            <option value="A06">A06</option>
+            <option value="A07">A07</option>
+            <option value="A08">A08</option>
+            <option value="A09">A09</option>
+            <option value="A10">A10</option>
+            <option value="A11">A11</option>
+            <option value="A12">A12</option>
+            <option value="A13">A13</option>
+            <option value="A14">A14</option>
+            <option value="A15">A15</option>
+            <option value="A16">A16</option>
+            <option value="B16">B16</option>
+            <option value="B15">B15</option>
+            <option value="B14">B14</option>
+            <option value="B13">B13</option>
+            <option value="B12">B12</option>
+            <option value="B11">B11</option>
+            <option value="B10">B10</option>
+            <option value="B09">B09</option>
+            <option value="B08">B08</option>
+            <option value="B07">B07</option>
+            <option value="B06">B06</option>
+            <option value="B05">B05</option>
+            <option value="B04">B04</option>
+            <option value="B03">B03</option>
+            <option value="B02">B02</option>
+            <option value="B01">B01</option>
           </select>
         </div>
         <div>
@@ -162,9 +162,9 @@
 
   <script>
     const $ = (id)=>document.getElementById(id);
-    const KEYS = {entries:'trato_entries_v8_4'};
-    const SYNC_URL = "https://script.google.com/macros/s/AKfycbxbpDQxHjonqd-Lc8SobZxV0Jq9WP5k9Blt_GFzRFAIChSkuHcnUJMOrwIc9PWwGdx9lg/exec";
-    const TOKEN    = "ASG05102025";
+    const KEYS = {entries:'trato_entries_v8_5'}; // nova versão local
+    // Seu endpoint SEM token:
+    const SYNC_URL = "https://script.google.com/macros/s/AKfycbyI2MCurivYZI2ixTNxINsPtU092aQszNJ4g7B027q2u9U05Ay0xqMSgMPHVAPocw96BA/exec";
 
     const SEQ = [
       "A01","A02","A03","A04","A05","A06","A07","A08","A09","A10","A11","A12","A13","A14","A15","A16",
@@ -222,7 +222,7 @@
 
     (function migrate(){
       if(entries.length) return;
-      const keys = ['trato_entries_v8_2','trato_entries_v8_1','trato_entries_v8','trato_entries_v7','trato_entries_v6','trato_entries_v5','trato_entries_v4','trato_entries_v3','trato_entries_v2','trato_entries'];
+      const keys = ['trato_entries_v8_4','trato_entries_v8_3','trato_entries_v8_2','trato_entries_v8_1','trato_entries_v8','trato_entries_v7','trato_entries_v6','trato_entries_v5','trato_entries_v4','trato_entries_v3','trato_entries_v2','trato_entries'];
       for(const k of keys){
         try{ const arr = JSON.parse(localStorage.getItem(k)||'[]'); if(Array.isArray(arr) && arr.length){ entries = arr; saveEntries(entries); break; } }catch{}
       }
@@ -310,7 +310,7 @@
 
     async function syncOne(url, r){
       try{ 
-        const res = await fetch(url, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({...r, token:TOKEN})});
+        const res = await fetch(url, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(r)});
         const data = await res.json().catch(()=>({}));
         return !!(data && data.ok===true);
       }catch(e){ return false; }
