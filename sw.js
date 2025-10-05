@@ -1,38 +1,54 @@
-// Força atualização do cache ao publicar esta versão
-const CACHE_NAME = 'trato-certo-v8.6';
-
-const ASSETS = [
+// Força atualização do PWA
+const CACHE_NAME = 'trato-certo-v8.8';
+const APP_SHELL = [
   './',
   './index.html',
-  './manifest.webmanifest',
-  './icons/icon-192.png',
-  './icons/icon-512.png'
+  './manifest.webmanifest'
+  // adicione ícones aqui caso use (ex: './icons/icon-192.png', './icons/icon-512.png')
 ];
 
-self.addEventListener('install', (e) => {
-  e.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS)).then(() => self.skipWaiting())
+self.addEventListener('install', (event) => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_SHELL))
   );
+  self.skipWaiting();
 });
 
-self.addEventListener('activate', (e) => {
-  e.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))
-    ).then(() => self.clients.claim())
-  );
+self.addEventListener('activate', (event) => {
+  event.waitUntil((async () => {
+    const keys = await caches.keys();
+    await Promise.all(keys.map(k => (k !== CACHE_NAME) && caches.delete(k)));
+  })());
+  self.clients.claim();
 });
 
-// Estratégia: cache-first para GET (offline). POST passa direto (sincronização é feita no app).
-self.addEventListener('fetch', (e) => {
-  const req = e.request;
-  if (req.method !== 'GET') return; // não intercepta POST
-  e.respondWith(
-    caches.match(req).then(cached => cached || fetch(req).then(res => {
-      // cacheia navegando
-      const resClone = res.clone();
-      caches.open(CACHE_NAME).then(cache => cache.put(req, resClone)).catch(()=>{});
+self.addEventListener('fetch', (event) => {
+  const req = event.request;
+
+  // Deixa POST/PUT/etc passarem (sincronização não é cacheada)
+  if (req.method !== 'GET') return;
+
+  // Navegação: tenta rede, cai para index do cache se offline
+  if (req.mode === 'navigate') {
+    event.respondWith(
+      fetch(req).catch(() => caches.match('./index.html'))
+    );
+    return;
+  }
+
+  // Assets GET: cache-first, cai para rede se faltar
+  event.respondWith((async () => {
+    const cache = await caches.open(CACHE_NAME);
+    const cached = await cache.match(req);
+    if (cached) return cached;
+    try {
+      const res = await fetch(req);
+      if (res && res.status === 200 && res.type === 'basic') {
+        cache.put(req, res.clone());
+      }
       return res;
-    }).catch(() => caches.match('./index.html')))
-  );
+    } catch {
+      return caches.match('./index.html');
+    }
+  })());
 });

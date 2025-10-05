@@ -26,7 +26,7 @@
     .diet input{display:none}
     .chip{padding:9px 12px;border-radius:999px;border:1px solid var(--line);transition:filter .2s}
     .chip:hover{filter:brightness(1.1)}
-    /* Diet colors */
+    /* Cores das dietas */
     .chip-d1{ background:rgba(22,163,74,.15); border-color:rgba(22,163,74,.55); }
     .chip-d2{ background:rgba(245,158,11,.15); border-color:rgba(245,158,11,.55); }
     .chip-d3{ background:rgba(168,85,247,.15); border-color:rgba(168,85,247,.55); }
@@ -41,14 +41,15 @@
     td{background:#0b1224;border:1px solid var(--line);border-left:none;border-right:none;padding:10px 12px}
     .right{text-align:right}
     .pill{display:inline-flex;gap:6px;padding:6px 10px;border-radius:999px;background:#0b1224;border:1px solid var(--line);font-size:12px}
+
     #box{ transition: background .2s, border-color .2s; }
   </style>
 </head>
 <body>
   <div class="wrap">
     <div class="card">
-      <h1>🐂 ASG – Trato Certo 
-        <span class="small" id="net">• offline</span> 
+      <h1>🐂 ASG – Trato Certo
+        <span class="small" id="net">• offline</span>
         <span class="pill"><span id="syncState">0 pendentes</span></span>
       </h1>
 
@@ -160,22 +161,19 @@
     </div>
   </div>
 
- <script>
-  const $ = (id)=>document.getElementById(id);
+  <script>
+    // ===== Configuração =====
+    const $ = (id)=>document.getElementById(id);
+    const KEYS = { entries: 'trato_entries_v8_7' }; // muda para forçar atualização do storage
+    const SYNC_URL = "https://script.google.com/macros/s/AKfycbyzzzdUroB5jiAXgD7IvxB3bLyLx4f9GDvaDnii6uL4GhUe7XeAXH5ySl5TsCF0cR_Q/exec"; // seu Apps Script (sem token)
 
-  // só para diferenciar a versão local e forçar recarregar:
-  const KEYS = { entries: 'trato_entries_v8_6' };
-
-  // COLE AQUI o SEU link novo do Apps Script (sem token):
-  const SYNC_URL = "https://script.google.com/macros/s/AKfycbyzzzdUroB5jiAXgD7IvxB3bLyLx4f9GDvaDnii6uL4GhUe7XeAXH5ySl5TsCF0cR_Q/exec";
-</script>
-
-
+    // Sequência dos boxes
     const SEQ = [
       "A01","A02","A03","A04","A05","A06","A07","A08","A09","A10","A11","A12","A13","A14","A15","A16",
       "B16","B15","B14","B13","B12","B11","B10","B09","B08","B07","B06","B05","B04","B03","B02","B01"
     ];
 
+    // Paletas de cor (A = rosa, B = azul)
     const ROSE = ['rgba(244,63,94,0.18)','rgba(251,113,133,0.18)','rgba(244,114,182,0.18)','rgba(253,164,175,0.18)'];
     const BLUE = ['rgba(59,130,246,0.18)','rgba(96,165,250,0.18)','rgba(56,189,248,0.18)','rgba(37,99,235,0.18)'];
     function boxColors(box){
@@ -202,6 +200,7 @@
       });
     }
 
+    // Data/hora local (Tocantins)
     function nowBR(){
       try{
         const fmt = new Intl.DateTimeFormat('pt-BR',{ timeZone:'America/Araguaina', year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', second:'2-digit'});
@@ -209,53 +208,54 @@
         const get = (t)=>parts.find(p=>p.type===t).value;
         const dia = `${get('day')}/${get('month')}/${get('year')}`;
         const hora = `${get('hour')}:${get('minute')}:${get('second')}`;
-        return {iso:new Date().toISOString(), dia, hora, both: `${dia} ${hora}`};
+        return {iso:new Date().toISOString(), dia, hora, both:`${dia} ${hora}`};
       }catch(e){
-        const d=new Date();
-        const pad=n=>String(n).padStart(2,'0');
+        const d=new Date(); const pad=n=>String(n).padStart(2,'0');
         const dia=`${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()}`;
         const hora=`${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
         return {iso:d.toISOString(), dia, hora, both:`${dia} ${hora}`};
       }
     }
 
-    function loadEntries(){
-      try{ return JSON.parse(localStorage.getItem(KEYS.entries)||'[]')||[]; }catch{ return []; }
-    }
+    // Storage
+    function loadEntries(){ try{ return JSON.parse(localStorage.getItem(KEYS.entries)||'[]')||[]; }catch{ return []; } }
     function saveEntries(v){ localStorage.setItem(KEYS.entries, JSON.stringify(v)); }
     let entries = loadEntries();
 
+    // Migração de chaves antigas (se houver)
     (function migrate(){
       if(entries.length) return;
-      const keys = ['trato_entries_v8_4','trato_entries_v8_3','trato_entries_v8_2','trato_entries_v8_1','trato_entries_v8','trato_entries_v7','trato_entries_v6','trato_entries_v5','trato_entries_v4','trato_entries_v3','trato_entries_v2','trato_entries'];
+      const keys = ['trato_entries_v8_6','trato_entries_v8_5','trato_entries_v8_4','trato_entries_v8_3','trato_entries_v8_2','trato_entries_v8_1','trato_entries_v8','trato_entries_v7','trato_entries_v6','trato_entries'];
       for(const k of keys){
         try{ const arr = JSON.parse(localStorage.getItem(k)||'[]'); if(Array.isArray(arr) && arr.length){ entries = arr; saveEntries(entries); break; } }catch{}
       }
     })();
 
+    // Online/offline
     function setNet(){ $("net").textContent = navigator.onLine ? "• online" : "• offline"; }
     window.addEventListener('online', ()=>{ setNet(); autoSync(); });
     window.addEventListener('offline', setNet);
 
+    // UI
     function populateBoxes(){
       const sel = $("box");
-      if(sel.options.length === 0){
-        for(const b of SEQ){ const o=document.createElement('option'); o.value=b; o.textContent=b; sel.appendChild(o); }
+      // As opções já estão hard-coded acima; só ajusta seleção
+      if(entries.length){
+        const last = entries[entries.length-1];
+        const idx = (SEQ.indexOf(last.box)+1) % SEQ.length;
+        sel.value = SEQ[idx];
+      }else{
+        sel.value = SEQ[0];
       }
-      if(entries.length){ const last=entries[entries.length-1]; const idx=(SEQ.indexOf(last.box)+1)%SEQ.length; sel.value=SEQ[idx]; }
-      else { sel.value = SEQ[0]; }
       paintBoxOptions(); paintBoxSelect();
       sel.addEventListener('change', paintBoxSelect);
     }
-
+    function setDiet(v){ document.querySelector(`input[name="diet"][value="${v}"]`)?.click(); }
     function getDiet(){ const r=document.querySelector('input[name="diet"]:checked'); return r? r.value : ""; }
-
-    function renderNow(){ const t = nowBR(); $("dateTinyVal").textContent = t.both; }
-
+    function renderNow(){ $("dateTinyVal").textContent = nowBR().both; }
     function nextBox(cur){ const i=SEQ.indexOf(cur); return i<0? SEQ[0] : SEQ[(i+1)%SEQ.length]; }
     function prevBox(cur){ const i=SEQ.indexOf(cur); return i<0? SEQ[0] : (i>0? SEQ[i-1] : SEQ[SEQ.length-1]); }
-
-    const fmt = (n)=>Number(n).toLocaleString('pt-BR', {minimumFractionDigits:1, maximumFractionDigits:1});
+    const fmt = (n)=>Number(n).toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1});
 
     function renderHist(){
       const tb = $("hist"); tb.innerHTML = "";
@@ -279,6 +279,7 @@
       $("syncState").textContent = entries.filter(x=>!x.synced).length + " pendentes";
     }
 
+    // Validação
     function validate(){
       const box=$("box").value; const diet=getDiet();
       const pin=parseFloat(($("pesoin").value||"").replace(',','.'));
@@ -292,6 +293,7 @@
       return {ok: msg.length===0, msg: msg.join("\n")};
     }
 
+    // Monta o registro
     function buildRow(){
       const pin=parseFloat(($("pesoin").value||"").replace(',','.'));
       const pout=parseFloat(($("pesoout").value||"").replace(',','.'));
@@ -306,43 +308,96 @@
       };
     }
 
-    function postLaunchAdjust(row, move='stay'){ 
-      $("pesoin").value = String(row.pesoOut); $("pesoout").value=""; $("obs").value="";
+    // Ajustes pós-lançamento
+    function postLaunchAdjust(row, move='stay'){
+      $("pesoin").value = String(row.pesoOut);
+      $("pesoout").value = "";
+      $("obs").value = "";
       if(move==='next') $("box").value = nextBox(row.box);
       if(move==='prev') $("box").value = prevBox(row.box);
-      renderNow(); $("pesoout").focus(); if('vibrate' in navigator) navigator.vibrate(15); paintBoxSelect();
+      renderNow(); $("pesoout").focus(); if('vibrate' in navigator) navigator.vibrate(15);
+      paintBoxSelect();
     }
 
+    // ===== Sincronização (sem header para evitar preflight) =====
     async function syncOne(url, r){
-      try{ 
-        const res = await fetch(url, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(r)});
-        const data = await res.json().catch(()=>({}));
-        return !!(data && data.ok===true);
-      }catch(e){ return false; }
+      try{
+        const res = await fetch(url, { method:'POST', body: JSON.stringify(r) }); // sem Content-Type
+        const txt = await res.text();
+        let data = null; try{ data = JSON.parse(txt); }catch(_){}
+        return !!(data && data.ok === true);
+      }catch{ return false; }
     }
 
     async function syncPending(){
       if(!navigator.onLine) return;
       let ok=0, fail=0;
-      for(const r of entries){ if(r.synced) continue; const s=await syncOne(SYNC_URL, r); if(s){ r.synced=true; ok++; saveEntries(entries); renderHist(); } else fail++; }
+      for(const r of entries){
+        if(r.synced) continue;
+        const s = await syncOne(SYNC_URL, r);
+        if(s){ r.synced = true; ok++; saveEntries(entries); renderHist(); } else { fail++; }
+      }
       alert(`Sincronização concluída. Sucesso: ${ok} • Falhas: ${fail}`);
     }
 
     function autoSync(){ if(navigator.onLine) syncPending(); }
 
-    function launch(move='stay'){ const v=validate(); if(!v.ok){ alert(v.msg); return false; } const row=buildRow(); entries.push(row); saveEntries(entries); renderHist(); postLaunchAdjust(row,move); autoSync(); return true; }
-    function undo(){ if(!entries.length) return; const last=entries[entries.length-1]; if(!confirm(`Desfazer último lançamento (${last.box} / ${last.diet})?`)) return; entries.pop(); saveEntries(entries); renderHist(); $("box").value=last.box; document.querySelector(`input[name="diet"][value="${last.diet}"]`)?.click(); $("pesoin").value=last.pesoIn; $("pesoout").value=last.pesoOut; $("obs").value=last.obs||""; paintBoxSelect(); }
-    function exportCSV(){ const header=['iso','dia','hora','box','dieta','peso_inicial','peso_final','consumo','obs','synced']; const lines=[header.join(';')]; for(const r of entries) lines.push([r.iso,r.dia,r.hora,r.box,r.diet,r.pesoIn,r.pesoOut,r.consumo,(r.obs||'').replaceAll(';',','),r.synced?1:0].join(';')); const blob=new Blob(['\ufeff'+lines.join('\n')],{type:'text/csv;charset=utf-8'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='trato_certo.csv'; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),500); }
+    // Ações
+    function launch(move='stay'){
+      const v=validate(); if(!v.ok){ alert(v.msg); return false; }
+      const row=buildRow(); entries.push(row); saveEntries(entries); renderHist(); postLaunchAdjust(row,move); autoSync(); return true;
+    }
+    function undo(){
+      if(!entries.length) return;
+      const last=entries[entries.length-1];
+      if(!confirm(`Desfazer último lançamento (${last.box} / ${last.diet})?`)) return;
+      entries.pop(); saveEntries(entries); renderHist();
+      $("box").value=last.box; setDiet(last.diet); $("pesoin").value=last.pesoIn; $("pesoout").value=last.pesoOut; $("obs").value=last.obs||"";
+      paintBoxSelect();
+    }
+    function exportCSV(){
+      const header=['iso','dia','hora','box','dieta','peso_inicial','peso_final','consumo','obs','synced'];
+      const lines=[header.join(';')];
+      for(const r of entries){
+        lines.push([r.iso,r.dia,r.hora,r.box,r.diet,r.pesoIn,r.pesoOut,r.consumo,(r.obs||'').replaceAll(';',','),r.synced?1:0].join(';'));
+      }
+      const blob=new Blob(['\ufeff'+lines.join('\n')],{type:'text/csv;charset=utf-8'});
+      const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='trato_certo.csv'; a.click();
+      setTimeout(()=>URL.revokeObjectURL(a.href),500);
+    }
 
-    document.addEventListener("DOMContentLoaded", ()=>{ 
-      setNet(); populateBoxes(); renderNow(); if(entries.length){ document.querySelector(`input[name="diet"][value="${entries[entries.length-1].diet}"]`)?.click(); $("pesoin").value=entries[entries.length-1].pesoOut; } renderHist();
-      $("btnLanc").addEventListener("click", ()=>launch('stay')); $("btnPrev").addEventListener("click", ()=>{ if(launch('prev')){} }); $("btnNext").addEventListener("click", ()=>{ if(launch('next')){} }); $("btnUndo").addEventListener("click", undo); $("btnExport").addEventListener("click", exportCSV); $("btnSync").addEventListener("click", syncPending);
-      document.addEventListener("keydown", (ev)=>{ if(ev.key==='Enter'){ ev.preventDefault(); launch('stay'); } if(ev.ctrlKey && ev.key.toLowerCase()==='z'){ ev.preventDefault(); undo(); } });
-      if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+    // Bootstrap
+    document.addEventListener("DOMContentLoaded", ()=>{
+      setNet(); populateBoxes(); renderNow();
+      if(entries.length){ setDiet(entries[entries.length-1].diet); $("pesoin").value=entries[entries.length-1].pesoOut; }
+      renderHist();
+
+      $("btnLanc").addEventListener("click", ()=>launch('stay'));
+      $("btnPrev").addEventListener("click", ()=>{ if(launch('prev')){} });
+      $("btnNext").addEventListener("click", ()=>{ if(launch('next')){} });
+      $("btnUndo").addEventListener("click", undo);
+      $("btnExport").addEventListener("click", exportCSV);
+      $("btnSync").addEventListener("click", syncPending);
+
+      document.addEventListener("keydown", (ev)=>{
+        if(ev.key==='Enter'){ ev.preventDefault(); launch('stay'); }
+        if(ev.ctrlKey && ev.key.toLowerCase()==='z'){ ev.preventDefault(); undo(); }
+      });
+
+      if('serviceWorker' in navigator){
+        navigator.serviceWorker.register('sw.js').catch(()=>{});
+      }
+
       setTimeout(autoSync,800);
     });
 
-    document.body.addEventListener('click', (e)=>{ const btn=e.target.closest('[data-del]'); if(!btn) return; const id=btn.getAttribute('data-del'); const idx=entries.findIndex(x=>x.id===id); if(idx>-1 && confirm('Excluir este lançamento?')){ entries.splice(idx,1); saveEntries(entries); renderHist(); } });
+    // Exclusão pelo histórico
+    document.body.addEventListener('click', (e)=>{
+      const btn=e.target.closest('[data-del]'); if(!btn) return;
+      const id=btn.getAttribute('data-del');
+      const idx=entries.findIndex(x=>x.id===id);
+      if(idx>-1 && confirm('Excluir este lançamento?')){ entries.splice(idx,1); saveEntries(entries); renderHist(); }
+    });
   </script>
 </body>
 </html>
