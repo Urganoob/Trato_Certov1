@@ -7,41 +7,85 @@
   <link rel="manifest" href="manifest.webmanifest">
   <meta name="theme-color" content="#22c55e" />
   <style>
-    :root { --bg:#0b1224; --card:#0f172a; --text:#e5e7eb; --muted:#94a3b8; --accent:#22c55e; --line:rgba(255,255,255,.08); }
+    /* ===== Tema mais claro/nítido ===== */
+    :root{
+      --bg:#0f1b33;          /* antes #0b1224 */
+      --card:#1e293b;        /* antes #0f172a */
+      --text:#eaf2ff;        /* levemente mais clara */
+      --muted:#9fb0c7;
+      --accent:#22c55e;
+      --line:rgba(255,255,255,.10);
+    }
     html,body{height:100%}
-    body{margin:0;background:linear-gradient(160deg,#0b1225,#0a0f1e 60%);color:var(--text);font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu}
+    body{
+      margin:0;
+      background:linear-gradient(160deg,#0f1b33,#112041 60%);
+      color:var(--text);
+      font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu
+    }
     .wrap{max-width:880px;margin:0 auto;padding:16px}
-    .card{background:rgba(17,24,39,.85);backdrop-filter: blur(6px);border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+    .card{
+      background:rgba(30,41,59,.92);
+      backdrop-filter: blur(6px);
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:14px;
+      box-shadow:0 12px 30px rgba(0,0,0,.35)
+    }
     h1{font-size:20px;margin:0 0 12px}
     label{display:block;font-size:12px;color:var(--muted);margin:4px 0 4px}
-    input,select,button,textarea{width:100%;border-radius:12px;border:1px solid var(--line);background:#0b1224;color:#e5e7eb;padding:12px 12px;font-size:16px;outline:none}
-    input:focus,select:focus,textarea:focus{border-color:#334155;box-shadow:0 0 0 3px rgba(59,130,246,.2)}
-    textarea::placeholder{color:var(--muted);font-size:12px;opacity:.9}
+    input,select,button,textarea{
+      width:100%;
+      border-radius:12px;
+      border:1px solid var(--line);
+      background:#122347;               /* inputs um pouco mais claros */
+      color:#eaf2ff;
+      padding:12px 12px;font-size:16px;outline:none
+    }
+    input:focus,select:focus,textarea:focus{border-color:#4069c6;box-shadow:0 0 0 3px rgba(64,105,198,.25)}
     .row{display:flex;gap:10px;align-items:end}
     .row>*{flex:1}
-    .btn{cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 14px;border-radius:14px;border:1px solid var(--line);background:#0d1429}
-    .btn.primary{background:linear-gradient(180deg,#22c55e,#16a34a);border-color:transparent;color:#05240f}
+
+    .btn{
+      cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;
+      padding:12px 14px;border-radius:14px;border:1px solid var(--line);background:#122347;color:#eaf2ff
+    }
+    .btn.primary{background:linear-gradient(180deg,#22c55e,#16a34a);border-color:transparent;color:#051b0f}
+    /* Botão Próximo bem aparente (azul forte) */
+    #btnNext{
+      background:linear-gradient(180deg,#3b82f6,#1d4ed8);
+      border-color:transparent;
+      color:#ffffff;
+      font-weight:800;
+      letter-spacing:.2px;
+    }
+
     .small{font-size:12px;color:var(--muted)}
     .diet{display:flex;gap:8px;flex-wrap:wrap}
     .diet input{display:none}
     .chip{padding:9px 12px;border-radius:999px;border:1px solid var(--line);transition:filter .2s}
-    .chip:hover{filter:brightness(1.1)}
-    /* Cores das dietas */
-    .chip-d1{ background:rgba(22,163,74,.15); border-color:rgba(22,163,74,.55); }
-    .chip-d2{ background:rgba(245,158,11,.15); border-color:rgba(245,158,11,.55); }
-    .chip-d3{ background:rgba(168,85,247,.15); border-color:rgba(168,85,247,.55); }
-    .chip-d4{ background:rgba(6,182,212,.15); border-color:rgba(6,182,212,.55); }
-    input[name="diet"][value="D1"]:checked + .chip-d1{ background:#16a34a;color:#051b0f;border-color:#16a34a;}
-    input[name="diet"][value="D2"]:checked + .chip-d2{ background:#f59e0b;color:#1b1202;border-color:#f59e0b;}
-    input[name="diet"][value="D3"]:checked + .chip-d3{ background:#a855f7;color:#180826;border-color:#a855f7;}
-    input[name="diet"][value="D4"]:checked + .chip-d4{ background:#06b6d4;color:#04161a;border-color:#06b6d4;}
+    .chip:hover{filter:brightness(1.08)}
+
+    /* ===== Cores novas das dietas =====
+       D4 = vermelho | D3 = rosa | D2 = azul | D1 = amarelo
+    */
+    .chip-d1{ background:rgba(250,204,21,.16);  border-color:rgba(250,204,21,.55);}  /* amarelo */
+    .chip-d2{ background:rgba(96,165,250,.16);  border-color:rgba(96,165,250,.55);}  /* azul */
+    .chip-d3{ background:rgba(244,114,182,.16); border-color:rgba(244,114,182,.55);} /* rosa */
+    .chip-d4{ background:rgba(239,68,68,.16);   border-color:rgba(239,68,68,.55);}   /* vermelho */
+
+    input[name="diet"][value="D1"]:checked + .chip-d1{ background:#facc15;color:#201700;border-color:#facc15;}
+    input[name="diet"][value="D2"]:checked + .chip-d2{ background:#3b82f6;color:#041021;border-color:#3b82f6;}
+    input[name="diet"][value="D3"]:checked + .chip-d3{ background:#f472b6;color:#2b0e1c;border-color:#f472b6;}
+    input[name="diet"][value="D4"]:checked + .chip-d4{ background:#ef4444;color:#220707;border-color:#ef4444;}
 
     table{width:100%;border-collapse:separate;border-spacing:0 8px}
     th{font-weight:600;text-align:left;font-size:12px;color:#9fb0c7}
-    td{background:#0b1224;border:1px solid var(--line);border-left:none;border-right:none;padding:10px 12px}
+    td{background:#122347;border:1px solid var(--line);border-left:none;border-right:none;padding:10px 12px}
     .right{text-align:right}
-    .pill{display:inline-flex;gap:6px;padding:6px 10px;border-radius:999px;background:#0b1224;border:1px solid var(--line);font-size:12px}
+    .pill{display:inline-flex;gap:6px;padding:6px 10px;border-radius:999px;background:#122347;border:1px solid var(--line);font-size:12px}
 
+    /* cores do select do Box ao alternar A/B (já existia) */
     #box{ transition: background .2s, border-color .2s; }
   </style>
 </head>
@@ -57,38 +101,14 @@
         <div>
           <label for="box">Box</label>
           <select id="box">
-            <option value="A01">A01</option>
-            <option value="A02">A02</option>
-            <option value="A03">A03</option>
-            <option value="A04">A04</option>
-            <option value="A05">A05</option>
-            <option value="A06">A06</option>
-            <option value="A07">A07</option>
-            <option value="A08">A08</option>
-            <option value="A09">A09</option>
-            <option value="A10">A10</option>
-            <option value="A11">A11</option>
-            <option value="A12">A12</option>
-            <option value="A13">A13</option>
-            <option value="A14">A14</option>
-            <option value="A15">A15</option>
-            <option value="A16">A16</option>
-            <option value="B16">B16</option>
-            <option value="B15">B15</option>
-            <option value="B14">B14</option>
-            <option value="B13">B13</option>
-            <option value="B12">B12</option>
-            <option value="B11">B11</option>
-            <option value="B10">B10</option>
-            <option value="B09">B09</option>
-            <option value="B08">B08</option>
-            <option value="B07">B07</option>
-            <option value="B06">B06</option>
-            <option value="B05">B05</option>
-            <option value="B04">B04</option>
-            <option value="B03">B03</option>
-            <option value="B02">B02</option>
-            <option value="B01">B01</option>
+            <option value="A01">A01</option><option value="A02">A02</option><option value="A03">A03</option><option value="A04">A04</option>
+            <option value="A05">A05</option><option value="A06">A06</option><option value="A07">A07</option><option value="A08">A08</option>
+            <option value="A09">A09</option><option value="A10">A10</option><option value="A11">A11</option><option value="A12">A12</option>
+            <option value="A13">A13</option><option value="A14">A14</option><option value="A15">A15</option><option value="A16">A16</option>
+            <option value="B16">B16</option><option value="B15">B15</option><option value="B14">B14</option><option value="B13">B13</option>
+            <option value="B12">B12</option><option value="B11">B11</option><option value="B10">B10</option><option value="B09">B09</option>
+            <option value="B08">B08</option><option value="B07">B07</option><option value="B06">B06</option><option value="B05">B05</option>
+            <option value="B04">B04</option><option value="B03">B03</option><option value="B02">B02</option><option value="B01">B01</option>
           </select>
         </div>
         <div>
@@ -113,10 +133,7 @@
         </div>
       </div>
 
-      <div>
-        <label for="obs">Observações</label>
-        <textarea id="obs" rows="2" placeholder="Opcional"></textarea>
-      </div>
+      <!-- Removido o campo Observações -->
 
       <div class="row" style="margin-top:10px">
         <button class="btn" id="btnPrev">◀️ Anterior (lança e volta)</button>
@@ -129,7 +146,7 @@
         <button class="btn" id="btnUndo">↩️ Desfazer último</button>
       </div>
 
-      <div class="small" id="dateTiny" style="text-align:right;margin-top:8px;color:#94a3b8">
+      <div class="small" id="dateTiny" style="text-align:right;margin-top:8px;color:#9fb0c7">
         Data/Hora: <span id="dateTinyVal"></span>
       </div>
 
@@ -140,7 +157,7 @@
 
     <div class="card" style="margin-top:16px">
       <h1 style="font-size:16px">Histórico</h1>
-      <div class="small" id="histInfo" style="color:#94a3b8">0 lançamento(s)</div>
+      <div class="small" id="histInfo" style="color:#9fb0c7">0 lançamento(s)</div>
       <div style="overflow:auto">
         <table>
           <thead>
@@ -151,7 +168,6 @@
               <th class="right">Peso In</th>
               <th class="right">Peso Out</th>
               <th class="right">Consumo</th>
-              <th>Obs.</th>
               <th></th>
             </tr>
           </thead>
@@ -162,18 +178,17 @@
   </div>
 
   <script>
-    // ===== Configuração =====
+    /* ===== Config ===== */
     const $ = (id)=>document.getElementById(id);
-    const KEYS = { entries: 'trato_entries_v8_7' }; // muda para forçar atualização do storage
-    const SYNC_URL = "https://script.google.com/macros/s/AKfycbyzzzdUroB5jiAXgD7IvxB3bLyLx4f9GDvaDnii6uL4GhUe7XeAXH5ySl5TsCF0cR_Q/exec"; // seu Apps Script (sem token)
+    const KEYS = { entries: 'trato_entries_v8_8' }; // muda a versão para forçar atualização local
+    const SYNC_URL = "https://script.google.com/macros/s/AKfycbyzzzdUroB5jiAXgD7IvxB3bLyLx4f9GDvaDnii6uL4GhUe7XeAXH5ySl5TsCF0cR_Q/exec";
 
-    // Sequência dos boxes
     const SEQ = [
       "A01","A02","A03","A04","A05","A06","A07","A08","A09","A10","A11","A12","A13","A14","A15","A16",
       "B16","B15","B14","B13","B12","B11","B10","B09","B08","B07","B06","B05","B04","B03","B02","B01"
     ];
 
-    // Paletas de cor (A = rosa, B = azul)
+    /* Cores alternadas do select do Box (rosa p/ A, azul p/ B) */
     const ROSE = ['rgba(244,63,94,0.18)','rgba(251,113,133,0.18)','rgba(244,114,182,0.18)','rgba(253,164,175,0.18)'];
     const BLUE = ['rgba(59,130,246,0.18)','rgba(96,165,250,0.18)','rgba(56,189,248,0.18)','rgba(37,99,235,0.18)'];
     function boxColors(box){
@@ -196,11 +211,11 @@
       [...sel.options].forEach(opt=>{
         const c = boxColors(opt.value);
         opt.style.background = c.bg;
-        opt.style.color = '#e5e7eb';
+        opt.style.color = '#eaf2ff';
       });
     }
 
-    // Data/hora local (Tocantins)
+    /* Data/hora TO */
     function nowBR(){
       try{
         const fmt = new Intl.DateTimeFormat('pt-BR',{ timeZone:'America/Araguaina', year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', second:'2-digit'});
@@ -217,29 +232,27 @@
       }
     }
 
-    // Storage
+    /* Storage */
     function loadEntries(){ try{ return JSON.parse(localStorage.getItem(KEYS.entries)||'[]')||[]; }catch{ return []; } }
     function saveEntries(v){ localStorage.setItem(KEYS.entries, JSON.stringify(v)); }
     let entries = loadEntries();
 
-    // Migração de chaves antigas (se houver)
     (function migrate(){
       if(entries.length) return;
-      const keys = ['trato_entries_v8_6','trato_entries_v8_5','trato_entries_v8_4','trato_entries_v8_3','trato_entries_v8_2','trato_entries_v8_1','trato_entries_v8','trato_entries_v7','trato_entries_v6','trato_entries'];
+      const keys = ['trato_entries_v8_7','trato_entries_v8_6','trato_entries_v8_5','trato_entries_v8_4','trato_entries_v8_3','trato_entries_v8_2','trato_entries_v8_1','trato_entries_v8','trato_entries_v7','trato_entries_v6','trato_entries'];
       for(const k of keys){
         try{ const arr = JSON.parse(localStorage.getItem(k)||'[]'); if(Array.isArray(arr) && arr.length){ entries = arr; saveEntries(entries); break; } }catch{}
       }
     })();
 
-    // Online/offline
+    /* Online/offline */
     function setNet(){ $("net").textContent = navigator.onLine ? "• online" : "• offline"; }
     window.addEventListener('online', ()=>{ setNet(); autoSync(); });
     window.addEventListener('offline', setNet);
 
-    // UI
+    /* UI */
     function populateBoxes(){
       const sel = $("box");
-      // As opções já estão hard-coded acima; só ajusta seleção
       if(entries.length){
         const last = entries[entries.length-1];
         const idx = (SEQ.indexOf(last.box)+1) % SEQ.length;
@@ -269,7 +282,6 @@
           `<span class="right">${fmt(r.pesoIn)}</span>`,
           `<span class="right">${fmt(r.pesoOut)}</span>`,
           `<span class="right">${fmt(r.consumo)}</span>`,
-          r.obs||"",
           `<button class="btn" data-del="${r.id}">Excluir</button>`
         ];
         for(const c of cells){ const td=document.createElement("td"); td.innerHTML=c; tr.appendChild(td); }
@@ -279,7 +291,6 @@
       $("syncState").textContent = entries.filter(x=>!x.synced).length + " pendentes";
     }
 
-    // Validação
     function validate(){
       const box=$("box").value; const diet=getDiet();
       const pin=parseFloat(($("pesoin").value||"").replace(',','.'));
@@ -293,7 +304,6 @@
       return {ok: msg.length===0, msg: msg.join("\n")};
     }
 
-    // Monta o registro
     function buildRow(){
       const pin=parseFloat(($("pesoin").value||"").replace(',','.'));
       const pout=parseFloat(($("pesoout").value||"").replace(',','.'));
@@ -303,32 +313,28 @@
         iso:t.iso, dia:t.dia, hora:t.hora,
         box:$("box").value, diet:getDiet(),
         pesoIn:pin, pesoOut:pout, consumo:+(pin-pout).toFixed(1),
-        obs: $("obs").value.trim(),
         synced:false
       };
     }
 
-    // Ajustes pós-lançamento
     function postLaunchAdjust(row, move='stay'){
       $("pesoin").value = String(row.pesoOut);
       $("pesoout").value = "";
-      $("obs").value = "";
       if(move==='next') $("box").value = nextBox(row.box);
       if(move==='prev') $("box").value = prevBox(row.box);
       renderNow(); $("pesoout").focus(); if('vibrate' in navigator) navigator.vibrate(15);
       paintBoxSelect();
     }
 
-    // ===== Sincronização (sem header para evitar preflight) =====
+    /* ===== Sync (sem header p/ evitar preflight) ===== */
     async function syncOne(url, r){
       try{
-        const res = await fetch(url, { method:'POST', body: JSON.stringify(r) }); // sem Content-Type
+        const res = await fetch(url, { method:'POST', body: JSON.stringify(r) });
         const txt = await res.text();
         let data = null; try{ data = JSON.parse(txt); }catch(_){}
         return !!(data && data.ok === true);
       }catch{ return false; }
     }
-
     async function syncPending(){
       if(!navigator.onLine) return;
       let ok=0, fail=0;
@@ -339,10 +345,9 @@
       }
       alert(`Sincronização concluída. Sucesso: ${ok} • Falhas: ${fail}`);
     }
-
     function autoSync(){ if(navigator.onLine) syncPending(); }
 
-    // Ações
+    /* Ações */
     function launch(move='stay'){
       const v=validate(); if(!v.ok){ alert(v.msg); return false; }
       const row=buildRow(); entries.push(row); saveEntries(entries); renderHist(); postLaunchAdjust(row,move); autoSync(); return true;
@@ -352,21 +357,21 @@
       const last=entries[entries.length-1];
       if(!confirm(`Desfazer último lançamento (${last.box} / ${last.diet})?`)) return;
       entries.pop(); saveEntries(entries); renderHist();
-      $("box").value=last.box; setDiet(last.diet); $("pesoin").value=last.pesoIn; $("pesoout").value=last.pesoOut; $("obs").value=last.obs||"";
+      $("box").value=last.box; setDiet(last.diet);
+      $("pesoin").value=last.pesoIn; $("pesoout").value=last.pesoOut;
       paintBoxSelect();
     }
     function exportCSV(){
-      const header=['iso','dia','hora','box','dieta','peso_inicial','peso_final','consumo','obs','synced'];
+      const header=['iso','dia','hora','box','dieta','peso_inicial','peso_final','consumo','synced'];
       const lines=[header.join(';')];
       for(const r of entries){
-        lines.push([r.iso,r.dia,r.hora,r.box,r.diet,r.pesoIn,r.pesoOut,r.consumo,(r.obs||'').replaceAll(';',','),r.synced?1:0].join(';'));
+        lines.push([r.iso,r.dia,r.hora,r.box,r.diet,r.pesoIn,r.pesoOut,r.consumo,r.synced?1:0].join(';'));
       }
       const blob=new Blob(['\ufeff'+lines.join('\n')],{type:'text/csv;charset=utf-8'});
       const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='trato_certo.csv'; a.click();
       setTimeout(()=>URL.revokeObjectURL(a.href),500);
     }
 
-    // Bootstrap
     document.addEventListener("DOMContentLoaded", ()=>{
       setNet(); populateBoxes(); renderNow();
       if(entries.length){ setDiet(entries[entries.length-1].diet); $("pesoin").value=entries[entries.length-1].pesoOut; }
@@ -387,11 +392,9 @@
       if('serviceWorker' in navigator){
         navigator.serviceWorker.register('sw.js').catch(()=>{});
       }
-
       setTimeout(autoSync,800);
     });
 
-    // Exclusão pelo histórico
     document.body.addEventListener('click', (e)=>{
       const btn=e.target.closest('[data-del]'); if(!btn) return;
       const id=btn.getAttribute('data-del');
