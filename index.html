@@ -134,8 +134,9 @@
 
   <script>
     const $ = (id)=>document.getElementById(id);
-    const KEYS = {entries:'trato_entries_v6'};
-    const SYNC_URL = ""https://script.google.com/macros/s/AKfycbxbpDQxHjonqd-Lc8SobZxV0Jq9WP5k9Blt_GFzRFAIChSkuHcnUJMOrwIc9PWwGdx9lg/exec""; // oculto da UI
+    const KEYS = {entries:'trato_entries_v8'};
+    const SYNC_URL = ""https://script.google.com/macros/s/AKfycbxbpDQxHjonqd-Lc8SobZxV0Jq9WP5k9Blt_GFzRFAIChSkuHcnUJMOrwIc9PWwGdx9lg/exec"";   // oculto da UI
+    const TOKEN    = ""ASG05102025"";      // token escolhido
 
     const SEQ = [
       ...Array.from({length:16}, (_,i)=>`A${String(i+1).padStart(2,'0')}`),
@@ -195,10 +196,10 @@
     function saveEntries(v){ localStorage.setItem(KEYS.entries, JSON.stringify(v)); }
     let entries = loadEntries();
 
-    // Migration from older keys v1..v5
+    // Migration from older keys v1..v7
     ;(()=>{
       if(entries.length) return;
-      const keys = ['trato_entries_v5','trato_entries_v4','trato_entries_v3','trato_entries_v2','trato_entries']; 
+      const keys = ['trato_entries_v7','trato_entries_v6','trato_entries_v5','trato_entries_v4','trato_entries_v3','trato_entries_v2','trato_entries']; 
       for(const k of keys){
         try{
           const raw = localStorage.getItem(k);
@@ -346,8 +347,17 @@
 
     async function syncOne(url, r){
       try{
-        const res = await fetch(url, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(r)});
-        return res.ok;
+        const res = await fetch(url, {
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ ...r, token: TOKEN })
+        });
+        let ok=false;
+        try{
+          const data = await res.json();
+          ok = !!(data && data.ok===true);
+        }catch(_){ ok=false; }
+        return ok;
       }catch(e){ return false; }
     }
 
@@ -448,9 +458,47 @@
   </script>
 
   <!--
-  ENDPOINT CONFIGURADO (hardcoded) PARA:
-  "https://script.google.com/macros/s/AKfycbxbpDQxHjonqd-Lc8SobZxV0Jq9WP5k9Blt_GFzRFAIChSkuHcnUJMOrwIc9PWwGdx9lg/exec"
-  Para trocar depois, gere um novo build substituindo a constante SYNC_URL no index.html.
+  CONFIG NO SERVIDOR (Apps Script):
+  1) Em "Configurações do projeto" > "Propriedades do script", crie/edite a chave:
+     TOKEN = ASG05102025
+  2) Publique como App da Web (Executar como VOCÊ, Acesso: Qualquer pessoa com o link).
+  3) Código do servidor (dedupe + token):
+
+  function doPost(e) {
+    try {
+      const body = JSON.parse(e.postData.contents || "{}");
+      const token = String(body.token || "");
+      const wanted = PropertiesService.getScriptProperties().getProperty("TOKEN");
+      if (!wanted || token !== wanted) {
+        return ContentService.createTextOutput(JSON.stringify({ ok:false, error:"unauthorized" })).setMimeType(ContentService.MimeType.JSON);
+      }
+      const sh = SpreadsheetApp.getActive().getSheetByName('LANCAMENTOS') || SpreadsheetApp.getActive().insertSheet('LANCAMENTOS');
+      const header = ['id','iso','dia','hora','box','diet','pesoIn','pesoOut','consumo','obs'];
+      if (sh.getLastRow() === 0) sh.appendRow(header);
+
+      // Deduplicação por id
+      const id = String(body.id || "");
+      if (id) {
+        const idCol = 1;
+        const last = sh.getLastRow();
+        if (last > 1) {
+          const ids = sh.getRange(2, idCol, last - 1, 1).getValues().flat();
+          if (ids.indexOf(id) !== -1) {
+            return ContentService.createTextOutput(JSON.stringify({ ok:true, dedupe:true })).setMimeType(ContentService.MimeType.JSON);
+          }
+        }
+      }
+
+      sh.appendRow([
+        body.id || "", body.iso || "", body.dia || "", body.hora || "",
+        body.box || "", body.diet || "", body.pesoIn || "", body.pesoOut || "",
+        body.consumo || "", body.obs || ""
+      ]);
+      return ContentService.createTextOutput(JSON.stringify({ ok:true })).setMimeType(ContentService.MimeType.JSON);
+    } catch (err) {
+      return ContentService.createTextOutput(JSON.stringify({ ok:false, error:String(err) })).setMimeType(ContentService.MimeType.JSON);
+    }
+  }
   -->
 </body>
 </html>

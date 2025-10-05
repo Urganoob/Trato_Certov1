@@ -1,4 +1,4 @@
-const CACHE_NAME = "trato-certo-v6";
+const CACHE_NAME = "trato-certo-v8";
 const ASSETS = [
   "./",
   "./index.html",
