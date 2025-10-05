@@ -134,14 +134,15 @@
 
   <script>
     const $ = (id)=>document.getElementById(id);
-    const KEYS = {entries:'trato_entries_v8'};
+    const KEYS = {entries:'trato_entries_v8_1'};
     const SYNC_URL = ""https://script.google.com/macros/s/AKfycbxbpDQxHjonqd-Lc8SobZxV0Jq9WP5k9Blt_GFzRFAIChSkuHcnUJMOrwIc9PWwGdx9lg/exec"";   // oculto da UI
     const TOKEN    = ""ASG05102025"";      // token escolhido
 
+    // HOTFIX: lista estática dos boxes
     const SEQ = [
-      ...Array.from({length:16}, (_,i)=>`A${String(i+1).padStart(2,'0')}`),
-      ...Array.from({length:16}, (_,i)=>`B${String(16 - i).padStart(2,'0')}`)
-    ]; // A01..A16, B16..B01
+      "A01","A02","A03","A04","A05","A06","A07","A08","A09","A10","A11","A12","A13","A14","A15","A16",
+      "B16","B15","B14","B13","B12","B11","B10","B09","B08","B07","B06","B05","B04","B03","B02","B01"
+    ];
 
     // Paletas (rosa para A, azul para B)
     const ROSE = ['rgba(244,63,94,0.18)','rgba(251,113,133,0.18)','rgba(244,114,182,0.18)','rgba(253,164,175,0.18)'];
@@ -196,10 +197,10 @@
     function saveEntries(v){ localStorage.setItem(KEYS.entries, JSON.stringify(v)); }
     let entries = loadEntries();
 
-    // Migration from older keys v1..v7
+    // Migration from older keys to v8_1
     ;(()=>{
       if(entries.length) return;
-      const keys = ['trato_entries_v7','trato_entries_v6','trato_entries_v5','trato_entries_v4','trato_entries_v3','trato_entries_v2','trato_entries']; 
+      const keys = ['trato_entries_v8','trato_entries_v7','trato_entries_v6','trato_entries_v5','trato_entries_v4','trato_entries_v3','trato_entries_v2','trato_entries']; 
       for(const k of keys){
         try{
           const raw = localStorage.getItem(k);
@@ -226,11 +227,12 @@
     function populateBoxes(){
       const sel = $("box");
       sel.innerHTML = "";
-      SEQ.forEach(b=>{
+      for(const b of SEQ){
         const opt = document.createElement("option");
-        opt.value=b; opt.textContent=b;
+        opt.value = b;
+        opt.textContent = b;
         sel.appendChild(opt);
-      });
+      }
       if(entries.length){
         const last = entries[entries.length-1];
         const idx = (SEQ.indexOf(last.box)+1) % SEQ.length;
@@ -255,13 +257,6 @@
     function renderNow(){ 
       const t = nowBR(); 
       $("dateTinyVal").textContent = t.both; 
-    }
-
-    function prefillFromLast(){
-      if(!entries.length) return;
-      const last = entries[entries.length-1];
-      setDiet(last.diet);
-      $("pesoin").value = last.pesoOut;
     }
 
     function nextBox(cur){
@@ -336,7 +331,6 @@
       $("pesoin").value = String(row.pesoOut);
       $("pesoout").value = "";
       $("obs").value = "";
-      setDiet(row.diet);
       if(move==='next') $("box").value = nextBox(row.box);
       if(move==='prev') $("box").value = prevBox(row.box);
       renderNow();
@@ -399,11 +393,11 @@
       const last = entries[entries.length-1];
       if(!confirm(`Desfazer último lançamento (${last.box} / ${last.diet})?`)) return;
       entries.pop(); saveEntries(entries); renderHist();
-      $("box").value = last.box;
-      setDiet(last.diet);
-      $("pesoin").value = last.pesoIn;
-      $("pesoout").value = last.pesoOut;
-      $("obs").value = last.obs||"";
+      document.getElementById("box").value = last.box;
+      document.querySelector(`input[name="diet"][value="${last.diet}"]`).checked = true;
+      document.getElementById("pesoin").value = last.pesoIn;
+      document.getElementById("pesoout").value = last.pesoOut;
+      document.getElementById("obs").value = last.obs||"";
       paintBoxSelect();
     }
 
@@ -425,15 +419,18 @@
       setNet();
       populateBoxes();
       renderNow();
-      if(entries.length){ setDiet(entries[entries.length-1].diet); $("pesoin").value = entries[entries.length-1].pesoOut; }
+      if(entries.length){ 
+        document.querySelector(`input[name="diet"][value="${entries[entries.length-1].diet}"]`)?.click();
+        document.getElementById("pesoin").value = entries[entries.length-1].pesoOut; 
+      }
       renderHist();
 
-      $("btnLanc").addEventListener("click", ()=>launch('stay'));
-      $("btnPrev").addEventListener("click", ()=>{ if(launch('prev')){} });
-      $("btnNext").addEventListener("click", ()=>{ if(launch('next')){} });
-      $("btnUndo").addEventListener("click", undo);
-      $("btnExport").addEventListener("click", exportCSV);
-      $("btnSync").addEventListener("click", syncPending);
+      document.getElementById("btnLanc").addEventListener("click", ()=>launch('stay'));
+      document.getElementById("btnPrev").addEventListener("click", ()=>{ if(launch('prev')){} });
+      document.getElementById("btnNext").addEventListener("click", ()=>{ if(launch('next')){} });
+      document.getElementById("btnUndo").addEventListener("click", undo);
+      document.getElementById("btnExport").addEventListener("click", exportCSV);
+      document.getElementById("btnSync").addEventListener("click", syncPending);
 
       document.addEventListener("keydown", (ev)=>{
         if(ev.key === "Enter"){ ev.preventDefault(); launch('stay'); }
@@ -456,49 +453,5 @@
       }
     });
   </script>
-
-  <!--
-  CONFIG NO SERVIDOR (Apps Script):
-  1) Em "Configurações do projeto" > "Propriedades do script", crie/edite a chave:
-     TOKEN = ASG05102025
-  2) Publique como App da Web (Executar como VOCÊ, Acesso: Qualquer pessoa com o link).
-  3) Código do servidor (dedupe + token):
-
-  function doPost(e) {
-    try {
-      const body = JSON.parse(e.postData.contents || "{}");
-      const token = String(body.token || "");
-      const wanted = PropertiesService.getScriptProperties().getProperty("TOKEN");
-      if (!wanted || token !== wanted) {
-        return ContentService.createTextOutput(JSON.stringify({ ok:false, error:"unauthorized" })).setMimeType(ContentService.MimeType.JSON);
-      }
-      const sh = SpreadsheetApp.getActive().getSheetByName('LANCAMENTOS') || SpreadsheetApp.getActive().insertSheet('LANCAMENTOS');
-      const header = ['id','iso','dia','hora','box','diet','pesoIn','pesoOut','consumo','obs'];
-      if (sh.getLastRow() === 0) sh.appendRow(header);
-
-      // Deduplicação por id
-      const id = String(body.id || "");
-      if (id) {
-        const idCol = 1;
-        const last = sh.getLastRow();
-        if (last > 1) {
-          const ids = sh.getRange(2, idCol, last - 1, 1).getValues().flat();
-          if (ids.indexOf(id) !== -1) {
-            return ContentService.createTextOutput(JSON.stringify({ ok:true, dedupe:true })).setMimeType(ContentService.MimeType.JSON);
-          }
-        }
-      }
-
-      sh.appendRow([
-        body.id || "", body.iso || "", body.dia || "", body.hora || "",
-        body.box || "", body.diet || "", body.pesoIn || "", body.pesoOut || "",
-        body.consumo || "", body.obs || ""
-      ]);
-      return ContentService.createTextOutput(JSON.stringify({ ok:true })).setMimeType(ContentService.MimeType.JSON);
-    } catch (err) {
-      return ContentService.createTextOutput(JSON.stringify({ ok:false, error:String(err) })).setMimeType(ContentService.MimeType.JSON);
-    }
-  }
-  -->
 </body>
 </html>
