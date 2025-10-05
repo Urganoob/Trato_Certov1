@@ -1,5 +1,5 @@
 // Força atualização do cache ao publicar esta versão
-const CACHE_NAME = 'trato-certo-v8.5';
+const CACHE_NAME = 'trato-certo-v8.6';
 
 const ASSETS = [
   './',

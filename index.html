@@ -160,11 +160,16 @@
     </div>
   </div>
 
-  <script>
-    const $ = (id)=>document.getElementById(id);
-    const KEYS = {entries:'trato_entries_v8_5'}; // nova versão local
-    // Seu endpoint SEM token:
-    const SYNC_URL = "https://script.google.com/macros/s/AKfycbyI2MCurivYZI2ixTNxINsPtU092aQszNJ4g7B027q2u9U05Ay0xqMSgMPHVAPocw96BA/exec";
+ <script>
+  const $ = (id)=>document.getElementById(id);
+
+  // só para diferenciar a versão local e forçar recarregar:
+  const KEYS = { entries: 'trato_entries_v8_6' };
+
+  // COLE AQUI o SEU link novo do Apps Script (sem token):
+  const SYNC_URL = "https://script.google.com/macros/s/AKfycbyzzzdUroB5jiAXgD7IvxB3bLyLx4f9GDvaDnii6uL4GhUe7XeAXH5ySl5TsCF0cR_Q/exec";
+</script>
+
 
     const SEQ = [
       "A01","A02","A03","A04","A05","A06","A07","A08","A09","A10","A11","A12","A13","A14","A15","A16",
