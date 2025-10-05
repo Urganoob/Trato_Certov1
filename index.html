@@ -14,7 +14,7 @@
     .card{background:rgba(17,24,39,.85);backdrop-filter: blur(6px);border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
     h1{font-size:20px;margin:0 0 12px}
     label{display:block;font-size:12px;color:var(--muted);margin:4px 0 4px}
-    input,select,button,textarea{width:100%;border-radius:12px;border:1px solid var(--line);background:#0b1224;color:var(--text);padding:12px 12px;font-size:16px;outline:none}
+    input,select,button,textarea{width:100%;border-radius:12px;border:1px solid var(--line);background:#0b1224;color:#e5e7eb;padding:12px 12px;font-size:16px;outline:none}
     input:focus,select:focus,textarea:focus{border-color:#334155;box-shadow:0 0 0 3px rgba(59,130,246,.2)}
     .row{display:flex;gap:10px;align-items:end}
     .row>*{flex:1}
@@ -38,20 +38,16 @@
       <h1>🐂 ASG – Trato Certo <span class="small" id="status"></span></h1>
       <div class="row">
         <div>
-          <label for="tratador">Tratador</label>
-          <input id="tratador" autocomplete="name" placeholder="Nome do tratador" />
-        </div>
-        <div>
           <label for="datahora">Data/Hora</label>
           <input id="datahora" disabled />
         </div>
-      </div>
-
-      <div class="row">
         <div>
           <label for="box">Box</label>
           <select id="box"></select>
         </div>
+      </div>
+
+      <div class="row">
         <div>
           <label>Dieta</label>
           <div class="diet">
@@ -69,8 +65,8 @@
           <input id="pesoin" type="number" inputmode="decimal" step="0.1" placeholder="Ex.: 1240,0" />
         </div>
         <div>
-          <label for="pesoout">Peso final (kg)</label>
-          <input id="pesoout" type="number" inputmode="decimal" step="0.1" placeholder="Ex.: 1350,0" />
+          <label for="pesoout">Peso final (kg) — deve ser MENOR que o inicial</label>
+          <input id="pesoout" type="number" inputmode="decimal" step="0.1" placeholder="Ex.: 1230,0" />
         </div>
       </div>
 
@@ -80,9 +76,9 @@
       </div>
 
       <div class="row" style="margin-top:10px">
-        <button class="btn" id="btnPrev">◀️ Anterior</button>
+        <button class="btn" id="btnPrev">◀️ Anterior (lança e volta)</button>
         <button class="btn primary" id="btnLanc">✅ Lançar (Enter)</button>
-        <button class="btn" id="btnNext">Próximo ▶️</button>
+        <button class="btn" id="btnNext">Próximo ▶️ (lança e avança)</button>
       </div>
 
       <div class="row" style="margin-top:10px">
@@ -91,13 +87,13 @@
       </div>
 
       <div class="small" style="margin-top:8px">
-        Dica: <b>Enter</b> lança • <b>Ctrl+Z</b> desfaz • Repete dieta e usa o <i>peso final</i> anterior como <i>peso inicial</i> do próximo.
+        Dica: <b>Enter</b> lança • <b>Próximo/Anterior</b> lançam e navegam • Repete dieta e usa o <i>peso final</i> anterior como <i>peso inicial</i> do próximo.
       </div>
     </div>
 
     <div class="card" style="margin-top:16px">
       <h1 style="font-size:16px">Histórico</h1>
-      <div class="small muted" id="histInfo">0 lançamentos</div>
+      <div class="small muted" id="histInfo">0 lançamento(s)</div>
       <div style="overflow:auto">
         <table>
           <thead>
@@ -107,8 +103,7 @@
               <th>Dieta</th>
               <th class="right">Peso In</th>
               <th class="right">Peso Out</th>
-              <th class="right">Líquido</th>
-              <th>Tratador</th>
+              <th class="right">Consumo</th>
               <th>Obs.</th>
               <th></th>
             </tr>
@@ -121,7 +116,7 @@
 
   <script>
     const $ = (id)=>document.getElementById(id);
-    const KEYS = {settings:'trato_settings', entries:'trato_entries'};
+    const KEYS = {entries:'trato_entries_v2'};
 
     const SEQ = [
       ...Array.from({length:16}, (_,i)=>`A${String(i+1).padStart(2,'0')}`),
@@ -147,10 +142,6 @@
     function saveEntries(v){ localStorage.setItem(KEYS.entries, JSON.stringify(v)); }
     let entries = loadEntries();
 
-    function loadSettings(){ try{return JSON.parse(localStorage.getItem(KEYS.settings)||'{}')}catch{return {}} }
-    function saveSettings(v){ localStorage.setItem(KEYS.settings, JSON.stringify(v)); }
-    let settings = Object.assign({tratador:''}, loadSettings());
-
     function setStatus(){
       $("status").textContent = navigator.onLine ? "• online" : "• offline";
     }
@@ -165,7 +156,6 @@
         opt.value=b; opt.textContent=b;
         sel.appendChild(opt);
       });
-      // default to first or last used
       if(entries.length){
         const last = entries[entries.length-1];
         const idx = (SEQ.indexOf(last.box)+1) % SEQ.length;
@@ -198,6 +188,11 @@
       if(i<0) return SEQ[0];
       return SEQ[(i+1)%SEQ.length];
     }
+    function prevBox(cur){
+      const i = SEQ.indexOf(cur);
+      if(i<0) return SEQ[0];
+      return i>0 ? SEQ[i-1] : SEQ[SEQ.length-1];
+    }
 
     function fmt(n){ return Number(n).toLocaleString('pt-BR', {minimumFractionDigits:1, maximumFractionDigits:1}); }
 
@@ -211,8 +206,8 @@
           r.box, r.diet,
           `<span class="right">${fmt(r.pesoIn)}</span>`,
           `<span class="right">${fmt(r.pesoOut)}</span>`,
-          `<span class="right">${fmt(r.liq)}</span>`,
-          r.tratador||"", r.obs||"",
+          `<span class="right">${fmt(r.consumo)}</span>`,
+          r.obs||"",
           `<button class="btn" data-del="${r.id}">Excluir</button>`
         ];
         for(const c of cells){ const td=document.createElement("td"); td.innerHTML=c; tr.appendChild(td); }
@@ -222,53 +217,56 @@
     }
 
     function validate(){
-      const trat = $("tratador").value.trim();
       const box = $("box").value;
       const diet = getDiet();
       const pin = parseFloat($("pesoin").value.replace(',','.'));
       const pout = parseFloat($("pesoout").value.replace(',','.'));
       let msg = [];
-      if(!trat) msg.push("Informe o tratador");
       if(!box) msg.push("Selecione o box");
       if(!diet) msg.push("Selecione a dieta");
       if(!Number.isFinite(pin)) msg.push("Peso inicial inválido");
       if(!Number.isFinite(pout)) msg.push("Peso final inválido");
+      if(Number.isFinite(pin) && Number.isFinite(pout) && !(pout < pin)){
+        msg.push("Peso final deve ser MENOR que o inicial");
+      }
       return {ok:msg.length===0, msg: msg.join("\n")};
     }
 
-    function launch(){
-      const v = validate();
-      if(!v.ok){ alert(v.msg); return; }
+    function buildRow(){
       const diet = getDiet();
       const pin = parseFloat($("pesoin").value.replace(',','.'));
       const pout = parseFloat($("pesoout").value.replace(',','.'));
-      const liq = +(pout - pin).toFixed(1);
-      if(liq < 0){
-        if(!confirm("Peso final menor que o inicial. Deseja lançar mesmo assim?")) return;
-      }
+      const consumo = +(pin - pout).toFixed(1); // positivo
       const t = nowBR();
-      const row = {
+      return {
         id: crypto.randomUUID(),
         iso: t.iso, dia: t.dia, hora: t.hora,
-        tratador: $("tratador").value.trim(),
         box: $("box").value,
-        diet, pesoIn: pin, pesoOut: pout, liq,
+        diet, pesoIn: pin, pesoOut: pout, consumo,
         obs: $("obs").value.trim()
       };
-      entries.push(row); saveEntries(entries);
-      settings.tratador = row.tratador; saveSettings(settings);
+    }
 
-      // Prepare next launch
-      $("box").value = nextBox(row.box);
-      setDiet(row.diet);
+    function postLaunchAdjust(row, move='stay'){
       $("pesoin").value = String(row.pesoOut);
       $("pesoout").value = "";
       $("obs").value = "";
+      setDiet(row.diet);
+      if(move==='next') $("box").value = nextBox(row.box);
+      if(move==='prev') $("box").value = prevBox(row.box);
       renderNow();
       $("pesoout").focus();
-
       if('vibrate' in navigator) navigator.vibrate(15);
+    }
+
+    function launch(move='stay'){
+      const v = validate();
+      if(!v.ok){ alert(v.msg); return false; }
+      const row = buildRow();
+      entries.push(row); saveEntries(entries);
       renderHist();
+      postLaunchAdjust(row, move);
+      return true;
     }
 
     function undo(){
@@ -284,10 +282,10 @@
     }
 
     function exportCSV(){
-      const header = ['data','hora','box','dieta','peso_inicial','peso_final','peso_liquido','tratador','obs'];
+      const header = ['data','hora','box','dieta','peso_inicial','peso_final','consumo','obs'];
       const lines = [header.join(';')];
       for(const r of entries){
-        lines.push([r.dia,r.hora,r.box,r.diet,r.pesoIn,r.pesoOut,r.liq,r.tratador,(r.obs||'').replaceAll(';',',')].join(';'));
+        lines.push([r.dia,r.hora,r.box,r.diet,r.pesoIn,r.pesoOut,r.consumo,(r.obs||'').replaceAll(';',',')].join(';'));
       }
       const blob = new Blob(["\ufeff"+lines.join("\n")], {type:"text/csv;charset=utf-8"});
       const a = document.createElement("a");
@@ -300,31 +298,32 @@
     document.addEventListener("DOMContentLoaded", ()=>{
       setStatus();
       populateBoxes();
-      $("tratador").value = settings.tratador || "";
       renderNow();
       if(entries.length){ setDiet(entries[entries.length-1].diet); $("pesoin").value = entries[entries.length-1].pesoOut; }
       renderHist();
 
-      $("btnLanc").addEventListener("click", launch);
-      $("btnPrev").addEventListener("click", ()=>{
-        const cur = $("box").value;
-        const i = SEQ.indexOf(cur);
-        $("box").value = i>0 ? SEQ[i-1] : SEQ[SEQ.length-1];
-      });
-      $("btnNext").addEventListener("click", ()=>{
-        $("box").value = nextBox($("box").value);
-      });
+      $("btnLanc").addEventListener("click", ()=>launch('stay'));
+      $("btnPrev").addEventListener("click", ()=>{ if(launch('prev')){} });
+      $("btnNext").addEventListener("click", ()=>{ if(launch('next')){} });
       $("btnUndo").addEventListener("click", undo);
       $("btnExport").addEventListener("click", exportCSV);
 
       document.addEventListener("keydown", (ev)=>{
-        if(ev.key === "Enter"){ ev.preventDefault(); launch(); }
+        if(ev.key === "Enter"){ ev.preventDefault(); launch('stay'); }
         if(ev.ctrlKey && ev.key.toLowerCase()==="z"){ ev.preventDefault(); undo(); }
       });
 
-      // Register SW
       if("serviceWorker" in navigator){
         navigator.serviceWorker.register("sw.js").catch(()=>{});
+      }
+    });
+
+    document.body.addEventListener('click', (e)=>{
+      const btn = e.target.closest('[data-del]'); if(!btn) return;
+      const id = btn.getAttribute('data-del');
+      const idx = entries.findIndex(x=>x.id===id);
+      if(idx>-1 && confirm("Excluir este lançamento?")){
+        entries.splice(idx,1); saveEntries(entries); renderHist();
       }
     });
   </script>

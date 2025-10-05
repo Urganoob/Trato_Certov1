@@ -1,4 +1,4 @@
-const CACHE_NAME = "trato-certo-v1";
+const CACHE_NAME = "trato-certo-v2";
 const ASSETS = [
   "./",
   "./index.html",
@@ -21,9 +21,6 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
   const req = event.request;
   event.respondWith(
-    caches.match(req).then(cached => cached || fetch(req).then(resp => {
-      // Optionally cache new requests
-      return resp;
-    }).catch(() => cached))
+    caches.match(req).then(cached => cached || fetch(req).then(resp => resp).catch(() => cached))
   );
 });
