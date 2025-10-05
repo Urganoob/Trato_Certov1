@@ -1,508 +1,456 @@
-    <!DOCTYPE html>
-    <html lang="pt-BR">
-    <head>
-      <meta charset="utf-8" />
-      <meta name="viewport" content="width=device-width, initial-scale=1" />
-      <title>ASG – Trato Certo</title>
-      <link rel="manifest" href="manifest.webmanifest">
-      <meta name="theme-color" content="#22c55e" />
-      <style>
-        :root { --bg:#0b1224; --card:#0f172a; --text:#e5e7eb; --muted:#94a3b8; --accent:#22c55e; --line:rgba(255,255,255,.08); }
-        html,body{height:100%}
-        body{margin:0;background:linear-gradient(160deg,#0b1225,#0a0f1e 60%);color:var(--text);font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu}
-        .wrap{max-width:880px;margin:0 auto;padding:16px}
-        .card{background:rgba(17,24,39,.85);backdrop-filter: blur(6px);border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
-        h1{font-size:20px;margin:0 0 12px}
-        label{display:block;font-size:12px;color:var(--muted);margin:4px 0 4px}
-        input,select,button,textarea{width:100%;border-radius:12px;border:1px solid var(--line);background:#0b1224;color:#e5e7eb;padding:12px 12px;font-size:16px;outline:none}
-        input:focus,select:focus,textarea:focus{border-color:#334155;box-shadow:0 0 0 3px rgba(59,130,246,.2)}
-        .row{display:flex;gap:10px;align-items:end}
-        .row>*{flex:1}
-        .btn{cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 14px;border-radius:14px;border:1px solid var(--line);background:#0d1429}
-        .btn.primary{background:linear-gradient(180deg,#22c55e,#16a34a);border-color:transparent;color:#05240f}
-        .small{font-size:12px;color:var(--muted)}
-        .diet{display:flex;gap:8px;flex-wrap:wrap}
-        .diet input{display:none}
-        .chip{padding:9px 12px;border-radius:999px;border:1px solid var(--line);transition:filter .2s}
-        .chip:hover{filter:brightness(1.1)}
-        /* Diet colors */
-        .chip-d1{ background:rgba(22,163,74,.15); border-color:rgba(22,163,74,.55); }
-        .chip-d2{ background:rgba(245,158,11,.15); border-color:rgba(245,158,11,.55); }
-        .chip-d3{ background:rgba(168,85,247,.15); border-color:rgba(168,85,247,.55); }
-        .chip-d4{ background:rgba(6,182,212,.15); border-color:rgba(6,182,212,.55); }
-        input[name="diet"][value="D1"]:checked + .chip-d1{ background:#16a34a;color:#051b0f;border-color:#16a34a;}
-        input[name="diet"][value="D2"]:checked + .chip-d2{ background:#f59e0b;color:#1b1202;border-color:#f59e0b;}
-        input[name="diet"][value="D3"]:checked + .chip-d3{ background:#a855f7;color:#180826;border-color:#a855f7;}
-        input[name="diet"][value="D4"]:checked + .chip-d4{ background:#06b6d4;color:#04161a;border-color:#06b6d4;}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ASG – Trato Certo</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#22c55e" />
+  <style>
+    :root { --bg:#0b1224; --card:#0f172a; --text:#e5e7eb; --muted:#94a3b8; --accent:#22c55e; --line:rgba(255,255,255,.08); }
+    html,body{height:100%}
+    body{margin:0;background:linear-gradient(160deg,#0b1225,#0a0f1e 60%);color:var(--text);font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu}
+    .wrap{max-width:880px;margin:0 auto;padding:16px}
+    .card{background:rgba(17,24,39,.85);backdrop-filter: blur(6px);border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+    h1{font-size:20px;margin:0 0 12px}
+    label{display:block;font-size:12px;color:var(--muted);margin:4px 0 4px}
+    input,select,button,textarea{width:100%;border-radius:12px;border:1px solid var(--line);background:#0b1224;color:#e5e7eb;padding:12px 12px;font-size:16px;outline:none}
+    input:focus,select:focus,textarea:focus{border-color:#334155;box-shadow:0 0 0 3px rgba(59,130,246,.2)}
+    textarea::placeholder{color:var(--muted);font-size:12px;opacity:.9}
+    .row{display:flex;gap:10px;align-items:end}
+    .row>*{flex:1}
+    .btn{cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 14px;border-radius:14px;border:1px solid var(--line);background:#0d1429}
+    .btn.primary{background:linear-gradient(180deg,#22c55e,#16a34a);border-color:transparent;color:#05240f}
+    .small{font-size:12px;color:var(--muted)}
+    .diet{display:flex;gap:8px;flex-wrap:wrap}
+    .diet input{display:none}
+    .chip{padding:9px 12px;border-radius:999px;border:1px solid var(--line);transition:filter .2s}
+    .chip:hover{filter:brightness(1.1)}
+    /* Diet colors */
+    .chip-d1{ background:rgba(22,163,74,.15); border-color:rgba(22,163,74,.55); }
+    .chip-d2{ background:rgba(245,158,11,.15); border-color:rgba(245,158,11,.55); }
+    .chip-d3{ background:rgba(168,85,247,.15); border-color:rgba(168,85,247,.55); }
+    .chip-d4{ background:rgba(6,182,212,.15); border-color:rgba(6,182,212,.55); }
+    input[name="diet"][value="D1"]:checked + .chip-d1{ background:#16a34a;color:#051b0f;border-color:#16a34a;}
+    input[name="diet"][value="D2"]:checked + .chip-d2{ background:#f59e0b;color:#1b1202;border-color:#f59e0b;}
+    input[name="diet"][value="D3"]:checked + .chip-d3{ background:#a855f7;color:#180826;border-color:#a855f7;}
+    input[name="diet"][value="D4"]:checked + .chip-d4{ background:#06b6d4;color:#04161a;border-color:#06b6d4;}
 
-        table{width:100%;border-collapse:separate;border-spacing:0 8px}
-        th{font-weight:600;text-align:left;font-size:12px;color:#9fb0c7}
-        td{background:#0b1224;border:1px solid var(--line);border-left:none;border-right:none;padding:10px 12px}
-        .right{text-align:right}
-        .muted{color:#94a3b8}
-        .ok{color:#86efac}
-        .warn{color:#fbbf24}
-        .bad{color:#fca5a5}
-        .pill{display:inline-flex;gap:6px;padding:6px 10px;border-radius:999px;background:#0b1224;border:1px solid var(--line);font-size:12px}
+    table{width:100%;border-collapse:separate;border-spacing:0 8px}
+    th{font-weight:600;text-align:left;font-size:12px;color:#9fb0c7}
+    td{background:#0b1224;border:1px solid var(--line);border-left:none;border-right:none;padding:10px 12px}
+    .right{text-align:right}
+    .muted{color:#94a3b8}
+    .ok{color:#86efac}
+    .warn{color:#fbbf24}
+    .bad{color:#fca5a5}
+    .pill{display:inline-flex;gap:6px;padding:6px 10px;border-radius:999px;background:#0b1224;border:1px solid var(--line);font-size:12px}
 
-        #box{ transition: background .2s, border-color .2s; }
-      </style>
-    </head>
-    <body>
-      <div class="wrap">
-        <div class="card">
-          <h1>🐂 ASG – Trato Certo 
-            <span class="small" id="net">• offline</span> 
-            <span class="pill"><span id="syncState">0 pendentes</span></span>
-          </h1>
+    #box{ transition: background .2s, border-color .2s; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>🐂 ASG – Trato Certo 
+        <span class="small" id="net">• offline</span> 
+        <span class="pill"><span id="syncState">0 pendentes</span></span>
+      </h1>
 
-          <div class="row">
-            <div>
-              <label for="box">Box</label>
-              <select id="box"></select>
-            </div>
-            <div>
-              <label>Dieta</label>
-              <div class="diet">
-                <label><input type="radio" name="diet" value="D1"><span class="chip chip-d1">D1</span></label>
-                <label><input type="radio" name="diet" value="D2"><span class="chip chip-d2">D2</span></label>
-                <label><input type="radio" name="diet" value="D3"><span class="chip chip-d3">D3</span></label>
-                <label><input type="radio" name="diet" value="D4"><span class="chip chip-d4">D4</span></label>
-              </div>
-            </div>
-          </div>
-
-          <div class="row">
-            <div>
-              <label for="pesoin">Peso inicial (kg)</label>
-              <input id="pesoin" type="number" inputmode="decimal" step="0.1" placeholder="Ex.: 1240,0" />
-            </div>
-            <div>
-              <label for="pesoout">Peso final (kg) — deve ser MENOR que o inicial</label>
-              <input id="pesoout" type="number" inputmode="decimal" step="0.1" placeholder="Ex.: 1230,0" />
-            </div>
-          </div>
-
-          <div>
-            <label for="obs">Observações</label>
-            <textarea id="obs" rows="2" placeholder="Sobra, ajuste umidade, etc. (opcional)"></textarea>
-          </div>
-
-          <div class="row" style="margin-top:10px">
-            <button class="btn" id="btnPrev">◀️ Anterior (lança e volta)</button>
-            <button class="btn primary" id="btnLanc">✅ Lançar (Enter)</button>
-            <button class="btn" id="btnNext">Próximo ▶️ (lança e avança)</button>
-          </div>
-
-          <div class="row" style="margin-top:10px">
-            <button class="btn" id="btnExport">⬇️ Exportar CSV</button>
-            <button class="btn" id="btnUndo">↩️ Desfazer último</button>
-          </div>
-
-          <div class="small muted" id="dateTiny" style="text-align:right;margin-top:8px">
-            Data/Hora: <span id="dateTinyVal"></span>
-          </div>
+      <div class="row">
+        <div>
+          <label for="box">Box</label>
+          <select id="box"></select>
         </div>
-
-        <div class="card" style="margin-top:16px">
-          <h1 style="font-size:16px">Sincronização</h1>
-          <div class="row">
-            <div>
-              <label for="syncUrl">URL do endpoint (Google Apps Script)</label>
-              <input id="syncUrl" placeholder="Cole aqui a URL do seu Apps Script" />
-            </div>
-            <div style="max-width:240px">
-              <label for="showDate">Mostrar data/hora no app?</label>
-              <select id="showDate">
-                <option value="on">Sim (pequeno no final)</option>
-                <option value="off">Não (só no upload)</option>
-              </select>
-            </div>
-            <div style="max-width:220px">
-              <label>&nbsp;</label>
-              <button class="btn" id="btnSync">🔄 Sincronizar agora</button>
-            </div>
-          </div>
-          <div class="small muted" id="syncInfo">Configure a URL para ativar a sincronização automática.</div>
-        </div>
-
-        <div class="card" style="margin-top:16px">
-          <h1 style="font-size:16px">Histórico</h1>
-          <div class="small muted" id="histInfo">0 lançamento(s)</div>
-          <div style="overflow:auto">
-            <table>
-              <thead>
-                <tr>
-                  <th>Data</th>
-                  <th>Box</th>
-                  <th>Dieta</th>
-                  <th class="right">Peso In</th>
-                  <th class="right">Peso Out</th>
-                  <th class="right">Consumo</th>
-                  <th>Obs.</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody id="hist"></tbody>
-            </table>
+        <div>
+          <label>Dieta</label>
+          <div class="diet">
+            <label><input type="radio" name="diet" value="D1"><span class="chip chip-d1">D1</span></label>
+            <label><input type="radio" name="diet" value="D2"><span class="chip chip-d2">D2</span></label>
+            <label><input type="radio" name="diet" value="D3"><span class="chip chip-d3">D3</span></label>
+            <label><input type="radio" name="diet" value="D4"><span class="chip chip-d4">D4</span></label>
           </div>
         </div>
       </div>
 
-      <script>
-        const $ = (id)=>document.getElementById(id);
-        const KEYS = {entries:'trato_entries_v5', syncUrl:'trato_sync_url', showDate:'trato_show_date'};
+      <div class="row">
+        <div>
+          <label for="pesoin">Peso inicial (kg)</label>
+          <input id="pesoin" type="number" inputmode="decimal" step="0.1" placeholder="Ex.: 1240,0" />
+        </div>
+        <div>
+          <label for="pesoout">Peso final (kg) — deve ser MENOR que o inicial</label>
+          <input id="pesoout" type="number" inputmode="decimal" step="0.1" placeholder="Ex.: 1230,0" />
+        </div>
+      </div>
 
-        const SEQ = [
-          ...Array.from({length:16}, (_,i)=>`A${String(i+1).padStart(2,'0')}`),
-          ...Array.from({length:16}, (_,i)=>`B${String(16 - i).padStart(2,'0')}`)
-        ]; // A01..A16, B16..B01
+      <div>
+        <label for="obs">Observações</label>
+        <textarea id="obs" rows="2" placeholder="Opcional"></textarea>
+      </div>
 
-        // Paletas (rosa para A, azul para B)
-        const ROSE = ['rgba(244,63,94,0.18)','rgba(251,113,133,0.18)','rgba(244,114,182,0.18)','rgba(253,164,175,0.18)'];
-        const BLUE = ['rgba(59,130,246,0.18)','rgba(96,165,250,0.18)','rgba(56,189,248,0.18)','rgba(37,99,235,0.18)'];
-        function boxColors(box){
-          const isA = box.startsWith('A');
-          const n = parseInt(box.slice(1),10);
-          const idx = isA ? (n-1) : (16 - n);
-          const bg = (isA? ROSE: BLUE)[idx % 4];
-          const border = isA ? 'rgba(244,114,182,.5)' : 'rgba(96,165,250,.5)';
-          return {bg, border};
-        }
-        function paintBoxSelect(){
-          const sel = $("box");
-          const v = sel.value || SEQ[0];
-          const c = boxColors(v);
-          sel.style.background = `linear-gradient(0deg, ${c.bg}, ${c.bg})`;
-          sel.style.borderColor = c.border;
-        }
-        function paintBoxOptions(){
-          const sel = $("box");
-          [...sel.options].forEach(opt=>{
-            const c = boxColors(opt.value);
-            opt.style.background = c.bg;
-            opt.style.color = '#e5e7eb';
-          });
-        }
+      <div class="row" style="margin-top:10px">
+        <button class="btn" id="btnPrev">◀️ Anterior (lança e volta)</button>
+        <button class="btn primary" id="btnLanc">✅ Lançar (Enter)</button>
+        <button class="btn" id="btnNext">Próximo ▶️ (lança e avança)</button>
+      </div>
 
-        function nowBR(){
-          try{
-            const fmt = new Intl.DateTimeFormat('pt-BR',{ timeZone:'America/Araguaina', year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', second:'2-digit'});
-            const parts = fmt.formatToParts(new Date());
-            const get = (t)=>parts.find(p=>p.type===t).value;
-            const dia = `${get('day')}/${get('month')}/${get('year')}`;
-            const hora = `${get('hour')}:${get('minute')}:${get('second')}`;
-            return {iso:new Date().toISOString(), dia, hora, both: `${dia} ${hora}`};
-          }catch(e){
-            const d=new Date();
-            const pad=n=>String(n).padStart(2,'0');
-            const dia=`${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()}`;
-            const hora=`${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
-            return {iso:d.toISOString(), dia, hora, both:`${dia} ${hora}`};
+      <div class="row" style="margin-top:10px">
+        <button class="btn" id="btnExport">⬇️ Exportar CSV</button>
+        <button class="btn" id="btnUndo">↩️ Desfazer último</button>
+      </div>
+
+      <div class="small muted" id="dateTiny" style="text-align:right;margin-top:8px">
+        Data/Hora: <span id="dateTinyVal"></span>
+      </div>
+
+      <div style="margin-top:10px; display:flex; justify-content:flex-end">
+        <button class="btn" id="btnSync">🔄 Sincronizar agora</button>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <h1 style="font-size:16px">Histórico</h1>
+      <div class="small muted" id="histInfo">0 lançamento(s)</div>
+      <div style="overflow:auto">
+        <table>
+          <thead>
+            <tr>
+              <th>Data</th>
+              <th>Box</th>
+              <th>Dieta</th>
+              <th class="right">Peso In</th>
+              <th class="right">Peso Out</th>
+              <th class="right">Consumo</th>
+              <th>Obs.</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="hist"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const $ = (id)=>document.getElementById(id);
+    const KEYS = {entries:'trato_entries_v6'};
+    const SYNC_URL = ""https://script.google.com/macros/s/AKfycbxbpDQxHjonqd-Lc8SobZxV0Jq9WP5k9Blt_GFzRFAIChSkuHcnUJMOrwIc9PWwGdx9lg/exec""; // oculto da UI
+
+    const SEQ = [
+      ...Array.from({length:16}, (_,i)=>`A${String(i+1).padStart(2,'0')}`),
+      ...Array.from({length:16}, (_,i)=>`B${String(16 - i).padStart(2,'0')}`)
+    ]; // A01..A16, B16..B01
+
+    // Paletas (rosa para A, azul para B)
+    const ROSE = ['rgba(244,63,94,0.18)','rgba(251,113,133,0.18)','rgba(244,114,182,0.18)','rgba(253,164,175,0.18)'];
+    const BLUE = ['rgba(59,130,246,0.18)','rgba(96,165,250,0.18)','rgba(56,189,248,0.18)','rgba(37,99,235,0.18)'];
+    function boxColors(box){
+      const isA = box.startsWith('A');
+      const n = parseInt(box.slice(1),10);
+      const idx = isA ? (n-1) : (16 - n);
+      const bg = (isA? ROSE: BLUE)[idx % 4];
+      const border = isA ? 'rgba(244,114,182,.5)' : 'rgba(96,165,250,.5)';
+      return {bg, border};
+    }
+    function paintBoxSelect(){
+      const sel = $("box");
+      const v = sel.value || SEQ[0];
+      const c = boxColors(v);
+      sel.style.background = `linear-gradient(0deg, ${c.bg}, ${c.bg})`;
+      sel.style.borderColor = c.border;
+    }
+    function paintBoxOptions(){
+      const sel = $("box");
+      [...sel.options].forEach(opt=>{
+        const c = boxColors(opt.value);
+        opt.style.background = c.bg;
+        opt.style.color = '#e5e7eb';
+      });
+    }
+
+    function nowBR(){
+      try{
+        const fmt = new Intl.DateTimeFormat('pt-BR',{ timeZone:'America/Araguaina', year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', second:'2-digit'});
+        const parts = fmt.formatToParts(new Date());
+        const get = (t)=>parts.find(p=>p.type===t).value;
+        const dia = `${get('day')}/${get('month')}/${get('year')}`;
+        const hora = `${get('hour')}:${get('minute')}:${get('second')}`;
+        return {iso:new Date().toISOString(), dia, hora, both: `${dia} ${hora}`};
+      }catch(e){
+        const d=new Date();
+        const pad=n=>String(n).padStart(2,'0');
+        const dia=`${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()}`;
+        const hora=`${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+        return {iso:d.toISOString(), dia, hora, both:`${dia} ${hora}`};
+      }
+    }
+
+    function loadEntries(){
+      try{
+        const v = JSON.parse(localStorage.getItem(KEYS.entries)||'[]');
+        return Array.isArray(v) ? v : [];
+      }catch{return []}
+    }
+    function saveEntries(v){ localStorage.setItem(KEYS.entries, JSON.stringify(v)); }
+    let entries = loadEntries();
+
+    // Migration from older keys v1..v5
+    ;(()=>{
+      if(entries.length) return;
+      const keys = ['trato_entries_v5','trato_entries_v4','trato_entries_v3','trato_entries_v2','trato_entries']; 
+      for(const k of keys){
+        try{
+          const raw = localStorage.getItem(k);
+          if(!raw) continue;
+          const arr = JSON.parse(raw)||[];
+          if(Array.isArray(arr) && arr.length){
+            entries = arr.map(r=>{
+              const consumo = 'consumo' in r ? r.consumo : (('liq' in r) ? r.liq : (r.pesoIn - r.pesoOut));
+              return {...r, consumo: +(+consumo).toFixed(1), synced: !!r.synced};
+            });
+            saveEntries(entries);
+            break;
           }
-        }
+        }catch{}
+      }
+    })();
 
-        function loadEntries(){
-          try{
-            const v = JSON.parse(localStorage.getItem(KEYS.entries)||'[]');
-            return Array.isArray(v) ? v : [];
-          }catch{return []}
-        }
-        function saveEntries(v){ localStorage.setItem(KEYS.entries, JSON.stringify(v)); }
-        let entries = loadEntries();
+    function setNet(){
+      $("net").textContent = navigator.onLine ? "• online" : "• offline";
+    }
+    window.addEventListener('online', ()=>{ setNet(); autoSync(); });
+    window.addEventListener('offline', setNet);
 
-        // Migration from v1/v2/v3 keys
-        ;(()=>{
-          if(entries.length) return;
-          const keys = ['trato_entries_v3', 'trato_entries_v2', 'trato_entries']; // v3, v2, v1
-          for(const k of keys){
-            try{
-              const raw = localStorage.getItem(k);
-              if(!raw) continue;
-              const arr = JSON.parse(raw)||[];
-              if(Array.isArray(arr) && arr.length){
-                // Normalize: v1 had fields pesoIn/pesoOut/liq; convert liq->consumo
-                entries = arr.map(r=>{
-                  const consumo = 'consumo' in r ? r.consumo : (('liq' in r) ? r.liq : (r.pesoIn - r.pesoOut));
-                  return {...r, consumo: +(+consumo).toFixed(1), synced: !!r.synced};
-                });
-                saveEntries(entries);
-                break;
-              }
-            }catch{}
-          }
-        })();
+    function populateBoxes(){
+      const sel = $("box");
+      sel.innerHTML = "";
+      SEQ.forEach(b=>{
+        const opt = document.createElement("option");
+        opt.value=b; opt.textContent=b;
+        sel.appendChild(opt);
+      });
+      if(entries.length){
+        const last = entries[entries.length-1];
+        const idx = (SEQ.indexOf(last.box)+1) % SEQ.length;
+        sel.value = SEQ[idx];
+      }else{
+        sel.value = SEQ[0];
+      }
+      paintBoxOptions();
+      paintBoxSelect();
+      sel.addEventListener('change', paintBoxSelect);
+    }
 
-        function setNet(){
-          $("net").textContent = navigator.onLine ? "• online" : "• offline";
-        }
-        window.addEventListener('online', ()=>{ setNet(); autoSync(); });
-        window.addEventListener('offline', setNet);
+    function setDiet(v){
+      const r = document.querySelector(`input[name="diet"][value="${v}"]`);
+      if(r) r.checked = true;
+    }
+    function getDiet(){
+      const r = document.querySelector('input[name="diet"]:checked');
+      return r ? r.value : "";
+    }
 
-        function populateBoxes(){
-          const sel = $("box");
-          sel.innerHTML = "";
-          SEQ.forEach(b=>{
-            const opt = document.createElement("option");
-            opt.value=b; opt.textContent=b;
-            sel.appendChild(opt);
-          });
-          if(entries.length){
-            const last = entries[entries.length-1];
-            const idx = (SEQ.indexOf(last.box)+1) % SEQ.length;
-            sel.value = SEQ[idx];
-          }else{
-            sel.value = SEQ[0];
-          }
-          paintBoxOptions();
-          paintBoxSelect();
-          sel.addEventListener('change', paintBoxSelect);
-        }
+    function renderNow(){ 
+      const t = nowBR(); 
+      $("dateTinyVal").textContent = t.both; 
+    }
 
-        function setDiet(v){
-          const r = document.querySelector(`input[name="diet"][value="${v}"]`);
-          if(r) r.checked = true;
-        }
-        function getDiet(){
-          const r = document.querySelector('input[name="diet"]:checked');
-          return r ? r.value : "";
-        }
+    function prefillFromLast(){
+      if(!entries.length) return;
+      const last = entries[entries.length-1];
+      setDiet(last.diet);
+      $("pesoin").value = last.pesoOut;
+    }
 
-        function renderNow(){ 
-          const t = nowBR(); 
-          $("dateTinyVal").textContent = t.both; 
-        }
+    function nextBox(cur){
+      const i = SEQ.indexOf(cur);
+      if(i<0) return SEQ[0];
+      return SEQ[(i+1)%SEQ.length];
+    }
+    function prevBox(cur){
+      const i = SEQ.indexOf(cur);
+      if(i<0) return SEQ[0];
+      return i>0 ? SEQ[i-1] : SEQ[SEQ.length-1];
+    }
 
-        function applyShowDate(){
-          const v = (localStorage.getItem(KEYS.showDate) || 'on');
-          $("showDate").value = v;
-          $("dateTiny").style.display = v === 'on' ? '' : 'none';
-        }
+    function fmt(n){ return Number(n).toLocaleString('pt-BR', {minimumFractionDigits:1, maximumFractionDigits:1}); }
 
-        function prefillFromLast(){
-          if(!entries.length) return;
-          const last = entries[entries.length-1];
-          setDiet(last.diet);
-          $("pesoin").value = last.pesoOut;
-        }
+    function renderHist(){
+      const tb = $("hist"); tb.innerHTML = "";
+      const view = entries.slice(-100).reverse();
+      for(const r of view){
+        const tr = document.createElement("tr");
+        const syncBadge = r.synced ? "" : " <span class='small warn'>(pendente)</span>";
+        const cells = [
+          `${r.dia} ${r.hora}`,
+          r.box, r.diet + syncBadge,
+          `<span class="right">${fmt(r.pesoIn)}</span>`,
+          `<span class="right">${fmt(r.pesoOut)}</span>`,
+          `<span class="right">${fmt(r.consumo)}</span>`,
+          r.obs||"",
+          `<button class="btn" data-del="${r.id}">Excluir</button>`
+        ];
+        for(const c of cells){ const td=document.createElement("td"); td.innerHTML=c; tr.appendChild(td); }
+        tb.appendChild(tr);
+      }
+      $("histInfo").textContent = `${entries.length} lançamento(s)`;
+      const pend = entries.filter(x=>!x.synced).length;
+      $("syncState").textContent = pend + " pendentes";
+    }
 
-        function nextBox(cur){
-          const i = SEQ.indexOf(cur);
-          if(i<0) return SEQ[0];
-          return SEQ[(i+1)%SEQ.length];
-        }
-        function prevBox(cur){
-          const i = SEQ.indexOf(cur);
-          if(i<0) return SEQ[0];
-          return i>0 ? SEQ[i-1] : SEQ[SEQ.length-1];
-        }
+    function validate(){
+      const box = $("box").value;
+      const diet = getDiet();
+      const pin = parseFloat($("pesoin").value.replace(',','.'));
+      const pout = parseFloat($("pesoout").value.replace(',','.'));
+      let msg = [];
+      if(!box) msg.push("Selecione o box");
+      if(!diet) msg.push("Selecione a dieta");
+      if(!Number.isFinite(pin)) msg.push("Peso inicial inválido");
+      if(!Number.isFinite(pout)) msg.push("Peso final inválido");
+      if(Number.isFinite(pin) && Number.isFinite(pout) && !(pout < pin)){
+        msg.push("Peso final deve ser MENOR que o inicial");
+      }
+      return {ok:msg.length===0, msg: msg.join("\n")};
+    }
 
-        function fmt(n){ return Number(n).toLocaleString('pt-BR', {minimumFractionDigits:1, maximumFractionDigits:1}); }
+    function buildRow(){
+      const diet = getDiet();
+      const pin = parseFloat($("pesoin").value.replace(',','.'));
+      const pout = parseFloat($("pesoout").value.replace(',','.'));
+      const consumo = +(pin - pout).toFixed(1);
+      const t = nowBR();
+      return {
+        id: crypto.randomUUID(),
+        iso: t.iso, dia: t.dia, hora: t.hora,
+        box: $("box").value,
+        diet, pesoIn: pin, pesoOut: pout, consumo,
+        obs: $("obs").value.trim(),
+        synced: false
+      };
+    }
 
-        function renderHist(){
-          const tb = $("hist"); tb.innerHTML = "";
-          const view = entries.slice(-100).reverse();
-          for(const r of view){
-            const tr = document.createElement("tr");
-            const syncBadge = r.synced ? "" : " <span class='small warn'>(pendente)</span>";
-            const cells = [
-              `${r.dia} ${r.hora}`,
-              r.box, r.diet + syncBadge,
-              `<span class="right">${fmt(r.pesoIn)}</span>`,
-              `<span class="right">${fmt(r.pesoOut)}</span>`,
-              `<span class="right">${fmt(r.consumo)}</span>`,
-              r.obs||"",
-              `<button class="btn" data-del="${r.id}">Excluir</button>`
-            ];
-            for(const c of cells){ const td=document.createElement("td"); td.innerHTML=c; tr.appendChild(td); }
-            tb.appendChild(tr);
-          }
-          $("histInfo").textContent = `${entries.length} lançamento(s)`;
-          const pend = entries.filter(x=>!x.synced).length;
-          $("syncState").textContent = pend + " pendentes";
-        }
+    function postLaunchAdjust(row, move='stay'){
+      $("pesoin").value = String(row.pesoOut);
+      $("pesoout").value = "";
+      $("obs").value = "";
+      setDiet(row.diet);
+      if(move==='next') $("box").value = nextBox(row.box);
+      if(move==='prev') $("box").value = prevBox(row.box);
+      renderNow();
+      $("pesoout").focus();
+      if('vibrate' in navigator) navigator.vibrate(15);
+      paintBoxSelect();
+    }
 
-        function validate(){
-          const box = $("box").value;
-          const diet = getDiet();
-          const pin = parseFloat($("pesoin").value.replace(',','.'));
-          const pout = parseFloat($("pesoout").value.replace(',','.'));
-          let msg = [];
-          if(!box) msg.push("Selecione o box");
-          if(!diet) msg.push("Selecione a dieta");
-          if(!Number.isFinite(pin)) msg.push("Peso inicial inválido");
-          if(!Number.isFinite(pout)) msg.push("Peso final inválido");
-          if(Number.isFinite(pin) && Number.isFinite(pout) && !(pout < pin)){
-            msg.push("Peso final deve ser MENOR que o inicial");
-          }
-          return {ok:msg.length===0, msg: msg.join("\n")};
-        }
+    async function syncOne(url, r){
+      try{
+        const res = await fetch(url, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(r)});
+        return res.ok;
+      }catch(e){ return false; }
+    }
 
-        function buildRow(){
-          const diet = getDiet();
-          const pin = parseFloat($("pesoin").value.replace(',','.'));
-          const pout = parseFloat($("pesoout").value.replace(',','.'));
-          const consumo = +(pin - pout).toFixed(1);
-          const t = nowBR();
-          return {
-            id: crypto.randomUUID(),
-            iso: t.iso, dia: t.dia, hora: t.hora,
-            box: $("box").value,
-            diet, pesoIn: pin, pesoOut: pout, consumo,
-            obs: $("obs").value.trim(),
-            synced: false
-          };
-        }
+    async function syncPending(){
+      const url = SYNC_URL;
+      if(!url) { return; }
+      if(!navigator.onLine){ return; }
+      let ok=0, fail=0;
+      for(const r of entries){
+        if(r.synced) continue;
+        const s = await syncOne(url, r);
+        if(s){ r.synced = true; ok++; saveEntries(entries); renderHist(); }
+        else { fail++; }
+      }
+      const msg = `Sincronização concluída. Sucesso: ${ok} • Falhas: ${fail}`;
+      alert(msg);
+    }
 
-        function postLaunchAdjust(row, move='stay'){
-          $("pesoin").value = String(row.pesoOut);
-          $("pesoout").value = "";
-          $("obs").value = "";
-          setDiet(row.diet);
-          if(move==='next') $("box").value = nextBox(row.box);
-          if(move==='prev') $("box").value = prevBox(row.box);
-          renderNow();
-          $("pesoout").focus();
-          if('vibrate' in navigator) navigator.vibrate(15);
-          paintBoxSelect();
-        }
+    function autoSync(){
+      const url = SYNC_URL;
+      if(!url) return;
+      if(!navigator.onLine) return;
+      syncPending();
+    }
 
-        async function syncOne(url, r){
-          try{
-            const res = await fetch(url, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(r)});
-            return res.ok;
-          }catch(e){ return false; }
-        }
+    function launch(move='stay'){
+      const v = validate();
+      if(!v.ok){ alert(v.msg); return false; }
+      const row = buildRow();
+      entries.push(row); saveEntries(entries);
+      renderHist();
+      postLaunchAdjust(row, move);
+      autoSync();
+      return true;
+    }
 
-        async function syncPending(){
-          const url = ($("syncUrl").value||'').trim();
-          if(!url) { $("syncInfo").textContent = "Informe a URL do Apps Script para sincronizar."; return; }
-          if(!navigator.onLine){ $("syncInfo").textContent = "Sem internet para sincronizar."; return; }
-          let ok=0, fail=0;
-          for(const r of entries){
-            if(r.synced) continue;
-            const s = await syncOne(url, r);
-            if(s){ r.synced = true; ok++; saveEntries(entries); renderHist(); }
-            else { fail++; }
-          }
-          $("syncInfo").textContent = `Sincronização concluída. Sucesso: ${ok} • Falhas: ${fail}`;
-        }
+    function undo(){
+      if(!entries.length) return;
+      const last = entries[entries.length-1];
+      if(!confirm(`Desfazer último lançamento (${last.box} / ${last.diet})?`)) return;
+      entries.pop(); saveEntries(entries); renderHist();
+      $("box").value = last.box;
+      setDiet(last.diet);
+      $("pesoin").value = last.pesoIn;
+      $("pesoout").value = last.pesoOut;
+      $("obs").value = last.obs||"";
+      paintBoxSelect();
+    }
 
-        function autoSync(){
-          const url = ($("syncUrl").value||'').trim();
-          if(!url) return;
-          if(!navigator.onLine) return;
-          syncPending();
-        }
+    function exportCSV(){
+      const header = ['iso','dia','hora','box','dieta','peso_inicial','peso_final','consumo','obs','synced'];
+      const lines = [header.join(';')];
+      for(const r of entries){
+        lines.push([r.iso,r.dia,r.hora,r.box,r.diet,r.pesoIn,r.pesoOut,r.consumo,(r.obs||'').replaceAll(';',','), r.synced?1:0].join(';'));
+      }
+      const blob = new Blob(["\ufeff"+lines.join("\n")], {type:"text/csv;charset=utf-8"});
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "trato_certo.csv";
+      a.click();
+      setTimeout(()=>URL.revokeObjectURL(a.href), 500);
+    }
 
-        function loadSyncUrl(){
-          try{
-            const v = localStorage.getItem(KEYS.syncUrl) || "";
-            $("syncUrl").value = v;
-          }catch{}
-        }
-        function saveSyncUrl(){
-          localStorage.setItem(KEYS.syncUrl, ($("syncUrl").value||'').trim());
-        }
+    document.addEventListener("DOMContentLoaded", ()=>{
+      setNet();
+      populateBoxes();
+      renderNow();
+      if(entries.length){ setDiet(entries[entries.length-1].diet); $("pesoin").value = entries[entries.length-1].pesoOut; }
+      renderHist();
 
-        function launch(move='stay'){
-          const v = validate();
-          if(!v.ok){ alert(v.msg); return false; }
-          const row = buildRow();
-          entries.push(row); saveEntries(entries);
-          renderHist();
-          postLaunchAdjust(row, move);
-          autoSync();
-          return true;
-        }
+      $("btnLanc").addEventListener("click", ()=>launch('stay'));
+      $("btnPrev").addEventListener("click", ()=>{ if(launch('prev')){} });
+      $("btnNext").addEventListener("click", ()=>{ if(launch('next')){} });
+      $("btnUndo").addEventListener("click", undo);
+      $("btnExport").addEventListener("click", exportCSV);
+      $("btnSync").addEventListener("click", syncPending);
 
-        function undo(){
-          if(!entries.length) return;
-          const last = entries[entries.length-1];
-          if(!confirm(`Desfazer último lançamento (${last.box} / ${last.diet})?`)) return;
-          entries.pop(); saveEntries(entries); renderHist();
-          $("box").value = last.box;
-          setDiet(last.diet);
-          $("pesoin").value = last.pesoIn;
-          $("pesoout").value = last.pesoOut;
-          $("obs").value = last.obs||"";
-          paintBoxSelect();
-        }
+      document.addEventListener("keydown", (ev)=>{
+        if(ev.key === "Enter"){ ev.preventDefault(); launch('stay'); }
+        if(ev.ctrlKey && ev.key.toLowerCase()==="z"){ ev.preventDefault(); undo(); }
+      });
 
-        function exportCSV(){
-          const header = ['iso','dia','hora','box','dieta','peso_inicial','peso_final','consumo','obs','synced'];
-          const lines = [header.join(';')];
-          for(const r of entries){
-            lines.push([r.iso,r.dia,r.hora,r.box,r.diet,r.pesoIn,r.pesoOut,r.consumo,(r.obs||'').replaceAll(';',','), r.synced?1:0].join(';'));
-          }
-          const blob = new Blob(["\ufeff"+lines.join("\n")], {type:"text/csv;charset=utf-8"});
-          const a = document.createElement("a");
-          a.href = URL.createObjectURL(blob);
-          a.download = "trato_certo.csv";
-          a.click();
-          setTimeout(()=>URL.revokeObjectURL(a.href), 500);
-        }
+      if("serviceWorker" in navigator){
+        navigator.serviceWorker.register("sw.js").catch(()=>{});
+      }
 
-        document.addEventListener("DOMContentLoaded", ()=>{
-          setNet();
-          populateBoxes();
-          renderNow();
-          loadSyncUrl();
-          $("showDate").value = localStorage.getItem(KEYS.showDate) || 'on';
-          applyShowDate();
-          if(entries.length){ setDiet(entries[entries.length-1].diet); $("pesoin").value = entries[entries.length-1].pesoOut; }
-          renderHist();
+      setTimeout(autoSync, 800);
+    });
 
-          $("btnLanc").addEventListener("click", ()=>launch('stay'));
-          $("btnPrev").addEventListener("click", ()=>{ if(launch('prev')){} });
-          $("btnNext").addEventListener("click", ()=>{ if(launch('next')){} });
-          $("btnUndo").addEventListener("click", undo);
-          $("btnExport").addEventListener("click", exportCSV);
-          $("btnSync").addEventListener("click", syncPending);
-          $("syncUrl").addEventListener("change", ()=>{ saveSyncUrl(); autoSync(); });
-          $("showDate").addEventListener("change", ()=>{ localStorage.setItem(KEYS.showDate, $("showDate").value); applyShowDate(); });
+    document.body.addEventListener('click', (e)=>{
+      const btn = e.target.closest('[data-del]'); if(!btn) return;
+      const id = btn.getAttribute('data-del');
+      const idx = entries.findIndex(x=>x.id===id);
+      if(idx>-1 && confirm("Excluir este lançamento?")){
+        entries.splice(idx,1); saveEntries(entries); renderHist();
+      }
+    });
+  </script>
 
-          document.addEventListener("keydown", (ev)=>{
-            if(ev.key === "Enter"){ ev.preventDefault(); launch('stay'); }
-            if(ev.ctrlKey && ev.key.toLowerCase()==="z"){ ev.preventDefault(); undo(); }
-          });
-
-          if("serviceWorker" in navigator){
-            navigator.serviceWorker.register("sw.js").catch(()=>{});
-          }
-
-          setTimeout(autoSync, 800);
-        });
-
-        document.body.addEventListener('click', (e)=>{
-          const btn = e.target.closest('[data-del]'); if(!btn) return;
-          const id = btn.getAttribute('data-del');
-          const idx = entries.findIndex(x=>x.id===id);
-          if(idx>-1 && confirm("Excluir este lançamento?")){
-            entries.splice(idx,1); saveEntries(entries); renderHist();
-          }
-        });
-      </script>
-
-      <!--
-=========================
-ENDPOINT (Google Apps Script) – MODELO
-Crie um Apps Script ligado a uma Planilha Google e cole este código. Depois: 
-Implantar > Nova implantação > Tipo: App da Web > Quem tem acesso: Qualquer pessoa com o link.
-
-function doPost(e) {
-  try {
-    const sh = SpreadsheetApp.getActive().getSheetByName('LANCAMENTOS') || SpreadsheetApp.getActive().insertSheet('LANCAMENTOS');
-    const head = ['iso','dia','hora','box','diet','pesoIn','pesoOut','consumo','obs'];
-    if (sh.getLastRow()===0) sh.appendRow(head);
-    const r = JSON.parse(e.postData.contents);
-    sh.appendRow([r.iso,r.dia,r.hora,r.box,r.diet,r.pesoIn,r.pesoOut,r.consumo,r.obs||'']);
-    return ContentService.createTextOutput(JSON.stringify({ok:true})).setMimeType(ContentService.MimeType.JSON);
-  } catch(err){
-    return ContentService.createTextOutput(JSON.stringify({ok:false, error:String(err)})).setMimeType(ContentService.MimeType.JSON);
-  }
-}
-=========================
--->
-    </body>
-    </html>
+  <!--
+  ENDPOINT CONFIGURADO (hardcoded) PARA:
+  "https://script.google.com/macros/s/AKfycbxbpDQxHjonqd-Lc8SobZxV0Jq9WP5k9Blt_GFzRFAIChSkuHcnUJMOrwIc9PWwGdx9lg/exec"
+  Para trocar depois, gere um novo build substituindo a constante SYNC_URL no index.html.
+  -->
+</body>
+</html>
