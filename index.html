@@ -60,7 +60,41 @@
       <div class="row">
         <div>
           <label for="box">Box</label>
-          <select id="box"></select>
+          <!-- HARD-CODED OPTIONS (sempre aparecem) -->
+          <select id="box">
+            <option value="A01">A01</option>
+<option value="A02">A02</option>
+<option value="A03">A03</option>
+<option value="A04">A04</option>
+<option value="A05">A05</option>
+<option value="A06">A06</option>
+<option value="A07">A07</option>
+<option value="A08">A08</option>
+<option value="A09">A09</option>
+<option value="A10">A10</option>
+<option value="A11">A11</option>
+<option value="A12">A12</option>
+<option value="A13">A13</option>
+<option value="A14">A14</option>
+<option value="A15">A15</option>
+<option value="A16">A16</option>
+<option value="B16">B16</option>
+<option value="B15">B15</option>
+<option value="B14">B14</option>
+<option value="B13">B13</option>
+<option value="B12">B12</option>
+<option value="B11">B11</option>
+<option value="B10">B10</option>
+<option value="B09">B09</option>
+<option value="B08">B08</option>
+<option value="B07">B07</option>
+<option value="B06">B06</option>
+<option value="B05">B05</option>
+<option value="B04">B04</option>
+<option value="B03">B03</option>
+<option value="B02">B02</option>
+<option value="B01">B01</option>
+          </select>
         </div>
         <div>
           <label>Dieta</label>
@@ -134,11 +168,11 @@
 
   <script>
     const $ = (id)=>document.getElementById(id);
-    const KEYS = {entries:'trato_entries_v8_1'};
+    const KEYS = {entries:'trato_entries_v8_2'};
     const SYNC_URL = ""https://script.google.com/macros/s/AKfycbxbpDQxHjonqd-Lc8SobZxV0Jq9WP5k9Blt_GFzRFAIChSkuHcnUJMOrwIc9PWwGdx9lg/exec"";   // oculto da UI
     const TOKEN    = ""ASG05102025"";      // token escolhido
 
-    // HOTFIX: lista estática dos boxes
+    // Lista que o JS também conhece (mas **não** apaga as <option> já no HTML)
     const SEQ = [
       "A01","A02","A03","A04","A05","A06","A07","A08","A09","A10","A11","A12","A13","A14","A15","A16",
       "B16","B15","B14","B13","B12","B11","B10","B09","B08","B07","B06","B05","B04","B03","B02","B01"
@@ -197,10 +231,10 @@
     function saveEntries(v){ localStorage.setItem(KEYS.entries, JSON.stringify(v)); }
     let entries = loadEntries();
 
-    // Migration from older keys to v8_1
+    // Migration from older keys
     ;(()=>{
       if(entries.length) return;
-      const keys = ['trato_entries_v8','trato_entries_v7','trato_entries_v6','trato_entries_v5','trato_entries_v4','trato_entries_v3','trato_entries_v2','trato_entries']; 
+      const keys = ['trato_entries_v8_1','trato_entries_v8','trato_entries_v7','trato_entries_v6','trato_entries_v5','trato_entries_v4','trato_entries_v3','trato_entries_v2','trato_entries']; 
       for(const k of keys){
         try{
           const raw = localStorage.getItem(k);
@@ -226,12 +260,13 @@
 
     function populateBoxes(){
       const sel = $("box");
-      sel.innerHTML = "";
-      for(const b of SEQ){
-        const opt = document.createElement("option");
-        opt.value = b;
-        opt.textContent = b;
-        sel.appendChild(opt);
+      // NÃO esvazia o select se já houver opções (hardcoded no HTML)
+      if(sel.options.length === 0){
+        for(const b of SEQ){
+          const opt = document.createElement("option");
+          opt.value = b; opt.textContent = b;
+          sel.appendChild(opt);
+        }
       }
       if(entries.length){
         const last = entries[entries.length-1];
@@ -318,7 +353,7 @@
       const consumo = +(pin - pout).toFixed(1);
       const t = nowBR();
       return {
-        id: crypto.randomUUID(),
+        id: (crypto?.randomUUID?.() || (Date.now().toString(36)+Math.random().toString(36).slice(2))),
         iso: t.iso, dia: t.dia, hora: t.hora,
         box: $("box").value,
         diet, pesoIn: pin, pesoOut: pout, consumo,
@@ -417,7 +452,7 @@
 
     document.addEventListener("DOMContentLoaded", ()=>{
       setNet();
-      populateBoxes();
+      populateBoxes();   // usa opções do HTML; só preenche se tiver 0
       renderNow();
       if(entries.length){ 
         document.querySelector(`input[name="diet"][value="${entries[entries.length-1].diet}"]`)?.click();
